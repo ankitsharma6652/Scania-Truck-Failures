@@ -1,7 +1,7 @@
 base:
   project: Scania-Truck-Failure
   # random_state: 42
-  # test_size: 0.2
+  # ltest_size: 0.2
 
 config:
   params: config/params.yaml
