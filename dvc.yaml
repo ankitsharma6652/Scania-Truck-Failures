@@ -7,4 +7,4 @@ stages:
       - config/config.yaml
     outs:
       - artifacts/local_data_dirs/aps_failure_training_set.csv
-      
+      - artifacts/local_data_dirs/aps_failure_test_set.csv

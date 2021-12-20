@@ -14,7 +14,6 @@ logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=lo
 def get_data(config_path):
     config = read_params(config_path)
 
-    # source_download_dirs = config["source_download_dirs"]
     source_download_train_dirs = config["data_source"]["s3_source_train"]
     source_download_test_dirs = config["data_source"]["s3_source_test"]
     df_train = pd.read_csv(source_download_train_dirs, sep=",")

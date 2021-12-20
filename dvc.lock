@@ -1,0 +1,21 @@
+schema: '2.0'
+stages:
+  load_data:
+    cmd: python src/stage_01_data_loader.py --config=config/config.yaml
+    deps:
+    - path: config/config.yaml
+      md5: 31e9abf519e1039b906922fcadbb4b3b
+      size: 3842
+    - path: src/stage_01_data_loader.py
+      md5: b81af55abfbbb57d23d3e37ddb2b0dae
+      size: 1888
+    - path: src/utils/all_utils.py
+      md5: 1d90b20f13680c4774949549f14a5caf
+      size: 821
+    outs:
+    - path: artifacts/local_data_dirs/aps_failure_test_set.csv
+      md5: 9afabca827bda6c6c1f751351b5f0f81
+      size: 11910399
+    - path: artifacts/local_data_dirs/aps_failure_training_set.csv
+      md5: 81a6720d7170e29280a42bc04671bd49
+      size: 44547982
