@@ -12,8 +12,6 @@ def read_params(config_path: str) -> dict:
     logging.info(f"yaml file:{config_path} loaded successfully")    
     return config
 
-
-
 def create_directory_path(dirs: list) -> None:
     for dir_path in dirs:
         os.makedirs(dir_path, exist_ok=True)

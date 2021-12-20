@@ -1,16 +1,15 @@
-source_download_dirs: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
-
-local_data_dirs: 
-  - data/train
-  - data/test  
+# source_download_dirs: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
+# source_download_dirs: /home/kiran/Documents/data_science/Scania-Truck-Failures/data/Training_Batch_Files/aps_failure_training_set.csv
+data_source: 
+  s3_source_train: https://scania-failure-truck.s3.us-east-1.amazonaws.com/data/aps_failure_training_set.csv?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPz%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCmFwLXNvdXRoLTEiRjBEAiAvL6jTaeEUzBfBWKHJeacT7gl90JT9%2BEJE0YIU0BHgywIgOvknCXSQI0p9UtMBMfGvxYmIaoae8I6niKOALGwkei4q%2FwII5f%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2ODQ2Nzc5MDQ0ODciDEbnHUrcNxjRr2alayrTAvr1u%2F3EvdJR5gj8n77QGpdJoAE9XvcG2orcyb3AjFT%2Fi4sBv4K5%2F%2FfQVO0n5YEgW7r1O6T%2B%2Bs1QiP9imj97CvDBdibBwfMq0PWHNjqF7hfFaX%2BIGaTYjaLlv3h3oVq05kGIzeZPNsMvXIRVyI57sQ8lo3F6mASVXg0pyVTbAZ7taPcXJNSvzdW8%2FFGdBfKZxHmfpMBUHjjxS9i8JrQ6VtzxLkgyIHKGTBEID64Qrv%2Fsf70uvSgGOcM4x6n%2FlvR%2BDaj38qAS5StXoq9RWj2zdj6iYKpvEpBquN%2FZd1D%2Bgh%2BK597aju4HKsrP6LOLzMAfeV8bAiV%2Fc3l2NFCM7%2FFo146Q%2B19S4dJKa5zO6mmhoTpdtgO9nyJacGttWNv4NFfmEC0GNLqHVNUUGZLSeK9%2B%2FBSAR%2F7Hd%2FD2dxfAj%2BuHFmGArVkg7Ov1imWw7kGbuADnyDswDzDT9v%2BNBjq0An%2F4zTF7cQZQFXsLx0NzRy2Mv029ALrJSrP330mn%2FsoiPrmThd%2FL3%2Fc5ZxrVQ6DzKxAwoVZq%2Bc0UwKENrYr3b4L0VvdPg0zezwkTMGBRBKhQyLQXMmS5t4BqM0xrwVlj7gWqRL7%2FSrzdcgp7wTkQYi3gO3rwk%2FAAKqiPqzPXmFrC9PZObhT5a88LfMcQ4vHsOXOQfuw3qZfnhCIOQ9RvJoFfN%2Bs4RWG6F3ZyWtQiohlHy%2FPkvBgEtL6%2FLeC11QYy5RAwPSYN%2B7%2FZ87%2BIBmFDbyOLshizlpo3UC2RoUp5GCp4QKVLuuucRgwD1%2BetHA4Bv6yl1nI1yBfalKITQnivCOcNEcI75RVMwGL%2FKud%2FEfpaJJxjMbSKWr%2FYhqoPAOfabSL5IbJ1qFVsrbr3qlKpak%2Bhvs75&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211220T115446Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=ASIAZ62P3XBTWP27E5PU%2F20211220%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=469f2bb976c51d4a392c4c1d3eaad4632a31932ca262336cd0610235b0b3c340
+  s3_source_test: https://scania-failure-truck.s3.us-east-1.amazonaws.com/data/aps_failure_test_set.csv?response-content-disposition=inline&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEPz%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCmFwLXNvdXRoLTEiRjBEAiAvL6jTaeEUzBfBWKHJeacT7gl90JT9%2BEJE0YIU0BHgywIgOvknCXSQI0p9UtMBMfGvxYmIaoae8I6niKOALGwkei4q%2FwII5f%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARAAGgw2ODQ2Nzc5MDQ0ODciDEbnHUrcNxjRr2alayrTAvr1u%2F3EvdJR5gj8n77QGpdJoAE9XvcG2orcyb3AjFT%2Fi4sBv4K5%2F%2FfQVO0n5YEgW7r1O6T%2B%2Bs1QiP9imj97CvDBdibBwfMq0PWHNjqF7hfFaX%2BIGaTYjaLlv3h3oVq05kGIzeZPNsMvXIRVyI57sQ8lo3F6mASVXg0pyVTbAZ7taPcXJNSvzdW8%2FFGdBfKZxHmfpMBUHjjxS9i8JrQ6VtzxLkgyIHKGTBEID64Qrv%2Fsf70uvSgGOcM4x6n%2FlvR%2BDaj38qAS5StXoq9RWj2zdj6iYKpvEpBquN%2FZd1D%2Bgh%2BK597aju4HKsrP6LOLzMAfeV8bAiV%2Fc3l2NFCM7%2FFo146Q%2B19S4dJKa5zO6mmhoTpdtgO9nyJacGttWNv4NFfmEC0GNLqHVNUUGZLSeK9%2B%2FBSAR%2F7Hd%2FD2dxfAj%2BuHFmGArVkg7Ov1imWw7kGbuADnyDswDzDT9v%2BNBjq0An%2F4zTF7cQZQFXsLx0NzRy2Mv029ALrJSrP330mn%2FsoiPrmThd%2FL3%2Fc5ZxrVQ6DzKxAwoVZq%2Bc0UwKENrYr3b4L0VvdPg0zezwkTMGBRBKhQyLQXMmS5t4BqM0xrwVlj7gWqRL7%2FSrzdcgp7wTkQYi3gO3rwk%2FAAKqiPqzPXmFrC9PZObhT5a88LfMcQ4vHsOXOQfuw3qZfnhCIOQ9RvJoFfN%2Bs4RWG6F3ZyWtQiohlHy%2FPkvBgEtL6%2FLeC11QYy5RAwPSYN%2B7%2FZ87%2BIBmFDbyOLshizlpo3UC2RoUp5GCp4QKVLuuucRgwD1%2BetHA4Bv6yl1nI1yBfalKITQnivCOcNEcI75RVMwGL%2FKud%2FEfpaJJxjMbSKWr%2FYhqoPAOfabSL5IbJ1qFVsrbr3qlKpak%2Bhvs75&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20211220T130501Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=ASIAZ62P3XBTWP27E5PU%2F20211220%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=f43b89cac90d80c9dc834dd380d623f72024f9be563b1e81c2965d438b7ca7d8
 
 artifacts: 
   artifacts_dir: artifacts
-  raw_local_dir: raw_local_dir
-  raw_local_file: data.csv
+  local_data_dirs: local_data_dirs
+  local_data_train_file: aps_failure_training_set.csv
+  local_data_test_file: aps_failure_test_set.csv
 
-
-  
 
   model_dir: model_dir
   model_filename: LogisticRegression.model
