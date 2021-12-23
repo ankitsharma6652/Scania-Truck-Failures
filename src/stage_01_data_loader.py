@@ -1,8 +1,9 @@
-from src.utils.all_utils import read_params, create_directory_path
+from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
 import argparse
 import os
 import logging
 import pandas as pd
+import s3fs
 
 logging_str = "[%(asctime)s: %(levelname)s %(module)s]: %(message)s"
 log_dir = "logs"
@@ -12,7 +13,7 @@ logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=lo
 
 
 def get_data(config_path):
-    config = read_params(config_path)
+    config = read_yaml(config_path)
 
     source_download_train_dirs = config["data_source"]["s3_source_train"]
     source_download_test_dirs = config["data_source"]["s3_source_test"]

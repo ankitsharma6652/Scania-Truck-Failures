@@ -8,3 +8,17 @@ stages:
     outs:
       - artifacts/local_data_dirs/aps_failure_training_set.csv
       - artifacts/local_data_dirs/aps_failure_test_set.csv
+
+  split_data:
+    cmd: python src/stage_02_split_data.py --config=config/config.yaml --params=config/params.yaml
+    deps:
+      - src/stage_02_split_data.py
+      - src/utils/all_utils.py
+      - config/config.yaml
+      - config/params.yaml
+    outs:
+      - artifacts/split_data_dir/train.csv
+      - artifacts/split_data_dir/test.csv
+
+      
+      

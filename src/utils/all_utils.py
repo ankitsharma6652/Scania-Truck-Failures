@@ -6,11 +6,11 @@ import time
 
 
 
-def read_params(config_path: str) -> dict:
+def read_yaml(config_path: str) -> dict:
     with open(config_path) as yaml_file:
-        config = yaml.safe_load(yaml_file)
+        content = yaml.safe_load(yaml_file)
     logging.info(f"yaml file:{config_path} loaded successfully")    
-    return config
+    return content
 
 def create_directory_path(dirs: list) -> None:
     for dir_path in dirs:
