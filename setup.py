@@ -11,7 +11,7 @@ setup(
     long_description_content_type="text/markdown",
     url="git@github.com:ankitsharma6652/Scania-Truck-Failures.git",
     author="Devashri Chaudhari and Ankit Sharma",
-    author_email="devashrichaudhari@gmail.com" ,
+    author_email="devashrichaudhari@gmail.com,ankitcoolji@gmail.com" ,
     packages=["src"],
     python_requires=">=3.7",
     license="MIT"

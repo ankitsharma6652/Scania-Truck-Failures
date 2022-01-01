@@ -23,6 +23,7 @@ def split_and_save(config_path, params_path):
 
     train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
 
+
     split_data_dir = config["artifacts"]["split_data_dir"]
 
     create_directory_path([os.path.join(artifacts_dir, split_data_dir)])

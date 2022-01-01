@@ -3,7 +3,7 @@ import argparse
 import os
 import logging
 import pandas as pd
-import s3fs
+# import s3fs
 
 logging_str = "[%(asctime)s: %(levelname)s %(module)s]: %(message)s"
 log_dir = "logs"
@@ -17,8 +17,8 @@ def get_data(config_path):
 
     source_download_train_dirs = config["data_source"]["s3_source_train"]
     source_download_test_dirs = config["data_source"]["s3_source_test"]
-    df_train = pd.read_csv(source_download_train_dirs, sep=",")
-    df_test = pd.read_csv(source_download_test_dirs, sep=",")
+    df_train = pd.read_csv(source_download_train_dirs, sep=",",skiprows=range(0,20))
+    df_test = pd.read_csv(source_download_test_dirs, sep=",",skiprows=range(0,20))
 
     artifacts_dir = config["artifacts"]['artifacts_dir']
     local_data_dirs = config["artifacts"]['local_data_dirs']
@@ -48,4 +48,4 @@ if __name__ == '__main__':
         logging.info("stage_00_data_loader completed! All the data are saved in local >>>>>")
     except Exception as e:
         logging.exception(e)
-        raise e    
+        raise e
