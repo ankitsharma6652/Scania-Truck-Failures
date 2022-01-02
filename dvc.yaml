@@ -19,6 +19,3 @@ stages:
     outs:
       - artifacts/split_data_dir/train.csv
       - artifacts/split_data_dir/test.csv
-
-      
-      
