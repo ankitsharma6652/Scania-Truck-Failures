@@ -9,6 +9,10 @@ artifacts:
   local_data_dirs: local_data_dirs
   local_data_train_file: aps_failure_training_set.csv
   local_data_test_file: aps_failure_test_set.csv
+  preprocessed_data_dir: preprocessed_data_dir
+  preprocessed_data_file: preprocessed_training_data.csv
+  target_column_data_dir: target_column_data_dir
+  target_column_data_file: target_column_training_data.csv
 
   split_data_dir: split_data_dir
   train: train.csv
