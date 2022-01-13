@@ -15,10 +15,6 @@ data_download:
 
 artifacts:
   training_data:
-    good_file_path: artifacts/training_data/Training_Raw_files_validated/Good_raw
-    bad_file_path: artifacts/training_data/Training_Raw_files_validated/Bad_raw
-    archive_bad_file_path: artifacts/training_data/TrainingArchiveBadData
-    training_file_from_db: artifacts/training_data/Training_FileFromDB
     master_csv: master.csv
     null_value_info_file_path:  artifacts/training_data/preprocessing/null_value
     plots: artifacts/training_data/plots
@@ -27,12 +23,7 @@ artifacts:
   model:
     model_path: artifacts/model
 
-
   prediction_data:
-    good_file_path: artifacts/prediction_data/Prediction_Raw_files_validated/Good_raw
-    bad_file_path: artifacts/prediction_data/Prediction_Raw_files_validated/Bad_raw
-    archive_bad_file_path: artifacts/prediction_data/PredictionArchiveBadData
-    prediction_file_from_db: artifacts/prediction_data/Prediction_FileFromDB
     master_csv: master.csv
     prediction_output_file_path: artifacts/Prediction_Output_DIR/
     prediction_file_name: Predictions.csv
