@@ -16,16 +16,22 @@ def split_and_save(config_path, params_path):
     artifacts_dir = config["artifacts"]['artifacts_dir']
     local_data_dirs = config["artifacts"]['local_data_dirs']
     local_data_train_file = config["artifacts"]['local_data_train_file']
-
+    preprocessed_data_dir = config["artifacts"]["preprocessed_data_dir"]
+    target_column_data_dir = config['artifacts']['target_column_data_dir']
+    preprocessed_data_file = config["artifacts"]["preprocessed_data_file"]
+    target_column_data_file = config["artifacts"]["target_column_data_file"]
     raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
+    preprocessed_data_file_path=os.path.join(artifacts_dir,preprocessed_data_dir,preprocessed_data_file)
+    target_column_data_file_path=os.path.join(artifacts_dir,target_column_data_dir,target_column_data_file)
 
-    print(raw_local_file_path)
+    # print(raw_local_file_path)
 
-    df = pd.read_csv(raw_local_file_path)
+    train = pd.read_csv(preprocessed_data_file_path)
+    test=pd.read_csv(target_column_data_file_path)
 
     split_ratio = params["base"]["test_size"]
     random_state = params["base"]["random_state"]
-    train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
+    x_train,y_train,x_test,y_test = train_test_split(train,test, test_size=split_ratio, random_state=random_state)
     split_data_dir = config["artifacts"]["split_data_dir"]
 
     create_directory_path([os.path.join(artifacts_dir, split_data_dir)])

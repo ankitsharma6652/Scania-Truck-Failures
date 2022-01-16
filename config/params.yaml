@@ -1,9 +1,11 @@
 base:
   project: Scania-Truck-Failure
   random_state: 42
-  test_size: 0.3
+  test_size: 0.25
   n_components: 90
-
+standard_scalar:
+  standard_scale_file_path: standard_scalar_object_dir
+  standard_scale_file_name: standard_scaling.pkl
 config:
   params: config/params.yaml
   schema_prediction: config/schema_prediction.json

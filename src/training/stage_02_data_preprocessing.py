@@ -9,6 +9,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from imblearn import over_sampling
 from sklearn.decomposition import PCA
+import pickle as p
 def get_label_column(df,label):
     target_column=df[label]
     df.drop(columns=['class'],inplace=True)
@@ -26,7 +27,7 @@ def standard_scaling(df):
     """
     std = get_standard_scaling_object()
     train_std=std.fit_transform(df)
-    return pd.DataFrame(train_std,columns=df.columns)
+    return pd.DataFrame(train_std,columns=df.columns),std
 def dimensionality_reduction_using_pca(df,n_components,random_state):
     """
     Performing dimensionality reduction using pca
@@ -108,6 +109,8 @@ def data_preprocessing(config_path, params_path):
     local_data_dirs = config["artifacts"]['local_data_dirs']
     local_data_train_file = config["artifacts"]['local_data_train_file']
     label=params["target_columns"]['columns']
+    standard_scaling_file_dir=params['standard_scalar']['standard_scale_file_path']
+    standard_scale_file_name=params['standard_scalar']['standard_scale_file_name']
     raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
 
     print(raw_local_file_path)
@@ -120,8 +123,10 @@ def data_preprocessing(config_path, params_path):
     df=remove_highly_corr_featues(df)
     df=upsampling_postive_class(downsampling_neg_class(df))
     target_column = get_label_column(df, label)
-    df=standard_scaling(df)
-    df=dimensionality_reduction_using_pca(df,n_components,random_state)
+    df = dimensionality_reduction_using_pca(df, n_components, random_state)
+    standard_scalar_data,standard_scaling_object=standard_scaling(df)
+
+    # df=df.merge(target_column)
 
 
     # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
@@ -130,6 +135,7 @@ def data_preprocessing(config_path, params_path):
 
     create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
     create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
+    create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
 
     preprocessed_data_file = config["artifacts"]["preprocessed_data_file"]
     target_column_data_file=config["artifacts"]["target_column_data_file"]
@@ -137,8 +143,12 @@ def data_preprocessing(config_path, params_path):
     # target_column_data_file: target_column_training_data
     preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
     target_column_data_path=os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
-    save_local_df(df, preprocessed_data_path)
+    standard_scaling_data_path=os.path.join(artifacts_dir,standard_scaling_file_dir,standard_scale_file_name)
+    save_local_df(standard_scalar_data, preprocessed_data_path)
     save_local_df(target_column, target_column_data_path)
+    with open(standard_scaling_data_path,'wb') as s:
+        p.dump(standard_scaling_object,s)
+
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
