@@ -1,7 +1,7 @@
 data_source: 
-  s3_source_train: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
-  s3_source_test: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
-  skiprows : 20
+  train_data: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
+  test_data: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
+  skiprows: 20
 
 artifacts: 
   artifacts_dir: artifacts

@@ -1,4 +1,4 @@
-from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
+from src.utils.all_utils import read_yaml, create_directory_path
 import argparse
 import os
 import logging
@@ -15,10 +15,10 @@ logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=lo
 def get_data(config_path):
     config = read_yaml(config_path)
 
-    source_download_train_dirs = config["data_source"]["s3_source_train"]
-    source_download_test_dirs = config["data_source"]["s3_source_test"]
-    df_train = pd.read_csv(source_download_train_dirs, sep=",",skiprows=range(0,20))
-    df_test = pd.read_csv(source_download_test_dirs, sep=",",skiprows=range(0,20))
+    source_download_train_dirs = config["data_source"]["train_data"]
+
+    df_train = pd.read_csv(source_download_train_dirs, sep=",", skiprows=range(0, 20))
+
 
     artifacts_dir = config["artifacts"]['artifacts_dir']
     local_data_dirs = config["artifacts"]['local_data_dirs']
@@ -30,11 +30,9 @@ def get_data(config_path):
     create_directory_path(dirs= [local_data_dir_path ])
 
     local_data_train_file_path = os.path.join(local_data_dir_path , local_data_train_file)
-    local_data_test_file_path = os.path.join(local_data_dir_path , local_data_test_file)
+
     
     df_train.to_csv(local_data_train_file_path, sep=",", index=False)
-    df_test.to_csv(local_data_test_file_path, sep=",", index=False)
-
 
 if __name__ == '__main__':
 
