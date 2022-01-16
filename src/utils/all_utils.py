@@ -16,7 +16,7 @@ import smtplib
 def read_yaml(config_path: str) -> dict:
     with open(config_path) as yaml_file:
         content = yaml.safe_load(yaml_file)
-    logging.info(f"yaml file:{config_path} loaded successfully")    
+        logging.info(f"yaml file:{config_path} loaded successfully")
     return content
 
 def create_directory_path(dirs: list) -> None:

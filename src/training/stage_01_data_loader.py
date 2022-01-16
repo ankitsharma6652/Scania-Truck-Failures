@@ -1,4 +1,4 @@
-from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
+from src.utils.all_utils import read_yaml, create_directory_path
 import argparse
 import os
 import logging
