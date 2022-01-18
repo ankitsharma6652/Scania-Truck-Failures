@@ -1,0 +1,44 @@
+#@author:ankitcoolji@gmail.com
+from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
+import argparse
+from cassandra.cluster import Cluster
+from cassandra.auth import PlainTextAuthProvider
+
+class DBOperations:
+    def __init__(self):
+        pass
+
+    def establish_connection(self,username,password):
+        try :
+            self.cloud_config = {
+                'secure_connect_bundle': r'D:\Scania-Truck-Failures\artifacts\secure-connect-scania-truck-failures.zip'
+            }
+            self.auth_provider = PlainTextAuthProvider(username,password)
+            self.cluster = Cluster(cloud=self.cloud_config, auth_provider=self.auth_provider)
+            self.session = self.cluster.connect()
+
+            row = self.session.execute("select release_version from system.local").one()
+            if row:
+                print(row[0])
+            else:
+                print("An error occurred.")
+
+            return self.cluster
+        except Exception as e:
+            print(e)
+            raise Exception("Error in connection establishment with Database",e)
+
+    def create_table(self,database_name):
+        self.session.execute(f"create table {database_name}.Logs(stage_name text, method_name text,logs text)")
+
+if __name__=='__main__':
+    # args = argparse.ArgumentParser()
+    #
+    # args.add_argument("--config", "-c", default="config/config.yaml")
+    # args.add_argument("--params", "-p", default="config/params.yaml")
+    # parsed_args = args.parse_args()
+    database_name='scania_truck_failures'
+    DB=DBOperations()
+    DB.establish_connection('nZwsNGMCBZfOFipzdNMzihNf', 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk')
+    DB.create_table(database_name)
+
