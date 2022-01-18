@@ -1,11 +1,10 @@
-from cProfile import label
-from signal import default_int_handler
+### @author : Ankit Sharma
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 import argparse
 import pandas as pd
 import os
 from sklearn.model_selection import train_test_split
-from sklearn.impute import SimpleImputer, MissingIndicator
+from sklearn.impute import SimpleImputer,MissingIndicator
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from imblearn import over_sampling
@@ -15,7 +14,6 @@ def get_label_column(df,label):
     target_column=df[label]
     df.drop(columns=['class'],inplace=True)
     return target_column
-
 
 def get_standard_scaling_object():
        return StandardScaler()
@@ -153,23 +151,11 @@ def data_preprocessing(config_path, params_path):
 
 
 if __name__ == '__main__':
-
     args = argparse.ArgumentParser()
 
-    args.add_argument("--config", default="config/config.yaml")
-    args.add_argument("--params", default="config/params.yaml")
+    args.add_argument("--config", "-c", default="config/config.yaml")
+    args.add_argument("--params", "-p", default="config/params.yaml")
 
     parsed_args = args.parse_args()
 
-    try:
-        logging.info(">>>>> stage_03_data_preprocessing started")
-
-        preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
-        preprocessing_object.data_preprocessing()
-
-        logging.info("stage_03_data_preprocessing is completed! All the data are saved in local >>>>>")
-
-    except Exception as e:
-        logging.exception(e)
-        raise e
-
+    data_preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
