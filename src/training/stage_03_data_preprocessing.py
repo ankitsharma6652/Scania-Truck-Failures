@@ -26,18 +26,19 @@ class preprocessing:
     def __init__(self, config_path, params_path):
         self.config = read_yaml(config_path)
         self.params = read_yaml(params_path)
-        self.target_column = self.params["target_columns"]['columns']
-        # pass
+        # self.target_column = self.params["target_columns"]['columns']
+        # self.df = df.drop(columns=self.target_column, inplace=True)
+        
 
-    # def get_label_column(df,label):
-    #     target_column=df[label]
-    #     df.drop(columns=['class'],inplace=True)
-    #     return target_column
-
-    def get_target_column(self, config_path):
-        self.params = read_yaml(config_path)
-        target_column = self.params["target_columns"]['columns']
+    def get_label_column(self, df, label):
+        self.target_column = df[label]
+        self.df.drop(columns=['class'],inplace=True)
         return target_column
+
+    # def get_target_column(self, config_path):
+    #     self.params = read_yaml(config_path)
+    #     target_column = self.params["target_columns"]['columns']
+    #     return target_column
 
     def get_standard_scaling_object(self):
         return StandardScaler()
@@ -63,12 +64,12 @@ class preprocessing:
         df = df_pca.fit_transform(df)
         return pd.DataFrame(df)
 
-    def label_encoding(self):
+    def label_encoding(self, df):
         """encode labels to 0 and 1"""
 
         le = LabelEncoder()
         # df = self.get_target_column(config_path)
-        df_target = le.fit_transform(self.target_column)
+        df_target = le.fit_transform(df['class'])
         df = df_target.copy()
         return df
 
@@ -93,7 +94,7 @@ class preprocessing:
         # Upsampling the positive class using Smote Technique
         sm = over_sampling.SMOTE()
         # sm = over_sampling.SMOTE()
-        df_Sampled_Smote, y_train = sm.fit_resample(df, self.target_column)
+        df_Sampled_Smote, y_train = sm.fit_resample(df,df['class'])
         return df_Sampled_Smote
 
     def downsampling_neg_class(self, df):
@@ -101,10 +102,10 @@ class preprocessing:
         #downsampling the negative class
         @author : Ankit Sharma
         """
-        # df_target = self.get_target_column(config_path)
+        df_target = df['class']
 
-        train_neg_sampled = df[self.target_column == 0].sample(n=10000, random_state=42)
-        train_Sampled = df[self.target_column == 1].append(train_neg_sampled)
+        train_neg_sampled = df[df_target == 0].sample(n=10000, random_state=42)
+        train_Sampled = df[df_target == 1].append(train_neg_sampled)
         return train_Sampled
 
     def handle_missing_values_using_median_imputation(self, df):
@@ -141,21 +142,24 @@ class preprocessing:
         artifacts_dir = self.config["artifacts"]['artifacts_dir']
         local_data_dirs = self.config["artifacts"]['local_data_dirs']
         local_data_train_file = self.config["artifacts"]['local_data_train_file']
-        # label = params["target_columns"]['columns']
+        label = self.params["target_columns"]['columns']
+        standard_scaling_file_dir=self.params['standard_scalar']['standard_scale_file_path']
+        standard_scale_file_name=self.params['standard_scalar']['standard_scale_file_name']
         raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
 
         print(raw_local_file_path)
 
         df = pd.read_csv(raw_local_file_path)
         self.remove_missing_values_columns(df)
-        df = self.label_encoding()
+        df = self.label_encoding(df)
         df = self.handle_missing_values_using_median_imputation(df)[0]
-        #  handle_missing_values_using_median_imputation(df)
+        # df = self.handle_missing_values_using_median_imputation(df)
         df = self.remove_highly_corr_featues(df)
         df = self.upsampling_postive_class(self.downsampling_neg_class(df))
-        #  target_column = get_label_column(df, label)
+        target_column = self.get_label_column(df, label)
         df = self.standard_scaling(df)
         df = self.dimensionality_reduction_using_pca(df, n_components, random_state)
+        standard_scalar_data,standard_scaling_object=self.standard_scaling(df)
 
         # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
         preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
@@ -163,6 +167,7 @@ class preprocessing:
 
         create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
         create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
+        create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
 
         preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
         target_column_data_file = self.config["artifacts"]["target_column_data_file"]
@@ -170,13 +175,16 @@ class preprocessing:
         # target_column_data_file: target_column_training_data
         preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
         target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
-        save_local_df(df, preprocessed_data_path)
-        save_local_df(self.target_column, target_column_data_path)
-
+        standard_scaling_data_path=os.path.join(artifacts_dir,standard_scaling_file_dir,standard_scale_file_name)
+        save_local_df(standard_scalar_data, preprocessed_data_path)
+        save_local_df(target_column, target_column_data_path)
+        with open(standard_scaling_data_path,'wb') as s:
+            p.dump(standard_scaling_object,s)
 
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()
+
     args.add_argument("--config", default="config/config.yaml")
     args.add_argument("--params", default="config/params.yaml")
 
@@ -193,3 +201,4 @@ if __name__ == '__main__':
     except Exception as e:
         logging.exception(e)
         raise e
+
