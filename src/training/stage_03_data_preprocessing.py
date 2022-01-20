@@ -1,3 +1,5 @@
+### @author : Ankit Sharma and Devashri Chaudhary
+
 from cProfile import label
 from signal import default_int_handler
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
@@ -11,6 +13,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import logging
+import pickle as p
 
 logging_str = "[%(asctime)s: %(levelname)s %(module)s]: %(message)s"
 log_dir = "preprocessing"
@@ -33,7 +36,7 @@ class preprocessing:
     def get_label_column(self, df, label):
         self.target_column = df[label]
         self.df.drop(columns=['class'],inplace=True)
-        return target_column
+        return self.target_column
 
     # def get_target_column(self, config_path):
     #     self.params = read_yaml(config_path)
@@ -50,9 +53,9 @@ class preprocessing:
         :return:dataframe after standard scaling and standard scaling object
         @author : Ankit Sharma
         """
-        std = self.get_standard_scaling_object()
-        train_std = std.fit_transform(df)
-        return pd.DataFrame(train_std, columns=df.columns)
+        self.std = self.get_standard_scaling_object()
+        self.train_std = self.std.fit_transform(df)
+        return pd.DataFrame(self.train_std, columns=df.columns),self.std
 
     def dimensionality_reduction_using_pca(self, df, n_components, random_state):
         """
@@ -60,18 +63,19 @@ class preprocessing:
         selecting 90 features(components) as they are  explaining 97% of data
             @author : Ankit Sharma
         """
-        df_pca = PCA(n_components=n_components, random_state=random_state)
-        df = df_pca.fit_transform(df)
-        return pd.DataFrame(df)
+        self.df=df
+        self.df_pca = PCA(n_components=n_components, random_state=random_state)
+        self.df = self.df_pca.fit_transform(self.df)
+        return pd.DataFrame(self.df)
 
     def label_encoding(self, df):
         """encode labels to 0 and 1"""
-
-        le = LabelEncoder()
+        self.df=df
+        self.le = LabelEncoder()
         # df = self.get_target_column(config_path)
-        df_target = le.fit_transform(df['class'])
-        df = df_target.copy()
-        return df
+        self.df['class'] = self.le.fit_transform(self.df['class'])
+        self.df = self.df.copy()
+        return self.df
 
     def remove_highly_corr_featues(self, df):
         """
@@ -79,34 +83,37 @@ class preprocessing:
             Removing Highly correlated features
             @author : Ankit Sharma
         """
-        corr_matrix = df.corr()
-        mask = np.triu(np.ones_like(corr_matrix, dtype=bool))
-        tri_df = corr_matrix.mask(mask)
-        to_drop = [c for c in tri_df.columns if any(tri_df[c] > 0.8)]
-        df_imp_features = df.drop(df[to_drop], axis=1)
-        return df_imp_features
+        self.df=df
+        self.corr_matrix = self.df.corr()
+        self.mask = np.triu(np.ones_like(self.corr_matrix, dtype=bool))
+        self.tri_df = self.corr_matrix.mask(self.mask)
+        self.to_drop = [c for c in self.tri_df.columns if any(self.tri_df[c] > 0.8)]
+        self.df_imp_features = self.df.drop(self.df[self.to_drop], axis=1)
+        return self.df_imp_features
 
     def upsampling_postive_class(self, df):
         """
         upsampling the positive class using smote to have balanced dataset.
         @author : Ankit Sharma
         """
+        self.df=df
         # Upsampling the positive class using Smote Technique
-        sm = over_sampling.SMOTE()
+        df.sm = over_sampling.SMOTE()
         # sm = over_sampling.SMOTE()
-        df_Sampled_Smote, y_train = sm.fit_resample(df,df['class'])
-        return df_Sampled_Smote
+        self.df_Sampled_Smote, self.y_train = self.df.sm.fit_resample(self.df,self.df['class'])
+        return self.df_Sampled_Smote
 
     def downsampling_neg_class(self, df):
         """
         #downsampling the negative class
         @author : Ankit Sharma
         """
-        df_target = df['class']
+        self.df=df
+        self.df_target = self.df['class']
 
-        train_neg_sampled = df[df_target == 0].sample(n=10000, random_state=42)
-        train_Sampled = df[df_target == 1].append(train_neg_sampled)
-        return train_Sampled
+        self.train_neg_sampled = self.df[self.df_target == 0].sample(n=10000, random_state=42)
+        self.train_Sampled = self.df[self.df_target == 1].append(self.train_neg_sampled)
+        return self.train_Sampled
 
     def handle_missing_values_using_median_imputation(self, df):
         """
@@ -114,73 +121,84 @@ class preprocessing:
         :return:imputed dataframe, imputed object
         @author : Ankit Sharma
         """
-
+        self.df=df
+        # print(self.df)
         # df1=df.drop(columns=['class'])
-        impute_median = SimpleImputer(missing_values=np.nan, strategy='median', copy=True, verbose=2)
-        df_imputed_median = pd.DataFrame(impute_median.fit_transform(df), columns=df.columns)
+        self.impute_median = SimpleImputer(missing_values=np.nan, strategy='median', copy=True, verbose=2)
+        self.df_imputed_median = pd.DataFrame(self.impute_median.fit_transform(self.df), columns=self.df.columns)
+        # print(self.df_imputed_median)
         # print(df_imputed_median.isna().sum().sum())
         # print(df_imputed_median.shape)
         # df_imputed_median['class']=df['class']
-        return df_imputed_median, impute_median
+        return self.df_imputed_median, self.impute_median
 
     def remove_missing_values_columns(self, df):
         """
         Replace the na and nan values with np.Nan and Removes the columns where >=70 % values are missing,
         @author : Ankit Sharma
         """
-        df.replace(to_replace=['na', 'nan'], value=np.NaN, inplace=True)
-        df.dropna(axis=1, thresh=df.shape[0] * 0.7, inplace=True)
+        self.df=df
+        self.df.replace(to_replace=['na', 'nan'], value=np.NaN, inplace=True)
+        self.df.dropna(axis=1, thresh=self.df.shape[0] * 0.7, inplace=True)
         # print(df.columns.shape)
-        return df
+        return self.df
 
     def data_preprocessing(self):
+
+        try:
         # config = read_yaml(config_path)
         # params = read_yaml(params_path)
-        n_components = self.params['base']['n_components']
-        random_state = self.params['base']['random_state']
+            n_components = self.params['base']['n_components']
+            random_state = self.params['base']['random_state']
 
-        artifacts_dir = self.config["artifacts"]['artifacts_dir']
-        local_data_dirs = self.config["artifacts"]['local_data_dirs']
-        local_data_train_file = self.config["artifacts"]['local_data_train_file']
-        label = self.params["target_columns"]['columns']
-        standard_scaling_file_dir=self.params['standard_scalar']['standard_scale_file_path']
-        standard_scale_file_name=self.params['standard_scalar']['standard_scale_file_name']
-        raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
+            artifacts_dir = self.config["artifacts"]['artifacts_dir']
+            local_data_dirs = self.config["artifacts"]['local_data_dirs']
+            local_data_train_file = self.config["artifacts"]['local_data_train_file']
+            label = self.params["target_columns"]['columns']
+            standard_scaling_file_dir=self.params['standard_scalar']['standard_scale_file_path']
+            standard_scale_file_name=self.params['standard_scalar']['standard_scale_file_name']
+            raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
 
-        print(raw_local_file_path)
+            print(raw_local_file_path)
 
-        df = pd.read_csv(raw_local_file_path)
-        self.remove_missing_values_columns(df)
-        df = self.label_encoding(df)
-        df = self.handle_missing_values_using_median_imputation(df)[0]
-        # df = self.handle_missing_values_using_median_imputation(df)
-        df = self.remove_highly_corr_featues(df)
-        df = self.upsampling_postive_class(self.downsampling_neg_class(df))
-        target_column = self.get_label_column(df, label)
-        df = self.standard_scaling(df)
-        df = self.dimensionality_reduction_using_pca(df, n_components, random_state)
-        standard_scalar_data,standard_scaling_object=self.standard_scaling(df)
+            self.df = pd.read_csv(raw_local_file_path)
+            # print(self.df)
+            self.df_after_removing_missing_values_columns=self.remove_missing_values_columns(self.df)
+            # print(self.df_after_removing_missing_values_columns)
+            self.df_after_label_encoding = self.label_encoding(self.df_after_removing_missing_values_columns)
+            # print(self.df_after_label_encoding)
+            self.df_missing_values_handled = self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)[0]
+            # df = self.handle_missing_values_using_median_imputation(df)
+            self.df_remove_highly_correlated_features = self.remove_highly_corr_featues(self.df_missing_values_handled)
+            self.df_upsampled_pos_class = self.upsampling_postive_class(self.downsampling_neg_class(self.df_remove_highly_correlated_features))
+            self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
+            # df = self.standard_scaling(self.df_upsampled_pos_class)
+            self.df_after_pca = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
+            self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_after_pca)
 
-        # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
-        preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
-        target_column_data_dir = self.config['artifacts']['target_column_data_dir']
+            # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
+            preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
+            target_column_data_dir = self.config['artifacts']['target_column_data_dir']
 
-        create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
-        create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
-        create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
+            create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
+            create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
+            create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
 
-        preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
-        target_column_data_file = self.config["artifacts"]["target_column_data_file"]
-        # target_column_data_dir: target_column_data_dir
-        # target_column_data_file: target_column_training_data
-        preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
-        target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
-        standard_scaling_data_path=os.path.join(artifacts_dir,standard_scaling_file_dir,standard_scale_file_name)
-        save_local_df(standard_scalar_data, preprocessed_data_path)
-        save_local_df(target_column, target_column_data_path)
-        with open(standard_scaling_data_path,'wb') as s:
-            p.dump(standard_scaling_object,s)
+            preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
+            target_column_data_file = self.config["artifacts"]["target_column_data_file"]
+            # target_column_data_dir: target_column_data_dir
+            # target_column_data_file: target_column_training_data
+            preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
+            target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
+            standard_scaling_data_path=os.path.join(artifacts_dir,standard_scaling_file_dir,standard_scale_file_name)
+            save_local_df(self.standard_scalar_data, preprocessed_data_path)
+            save_local_df(self.target_column, target_column_data_path)
+            with open(standard_scaling_data_path,'wb') as s:
+                p.dump(self.standard_scaling_object,s)
 
+        except Exception as e:
+            print(e)
+            raise Exception(e)
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()
