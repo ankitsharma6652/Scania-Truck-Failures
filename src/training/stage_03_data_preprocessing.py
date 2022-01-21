@@ -10,7 +10,10 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import pickle as p
-
+def get_label_column(df,label):
+    target_column=df[label]
+    df.drop(columns=['class'],inplace=True)
+    return target_column
 
 
 def get_standard_scaling_object():
