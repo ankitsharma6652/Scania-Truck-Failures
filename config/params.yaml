@@ -36,8 +36,8 @@ data_source:
 
 
 log_database:
-  training_database_name: scania_training
-  prediction_database_name: scania_prediction
+  training_table_name: scania_training
+  prediction_table_name: scania_prediction
 
 dataset:
   unwanted_column:

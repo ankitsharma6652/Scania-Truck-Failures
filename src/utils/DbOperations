@@ -28,8 +28,12 @@ class DBOperations:
             print(e)
             raise Exception("Error in connection establishment with Database",e)
 
-    def create_table(self,database_name):
-        self.session.execute(f"create table {database_name}.Logs(stage_name text, method_name text,logs text)")
+    def create_table(self,database_name,table_name):
+        self.session.execute(f"create table if not exists {database_name}.{table_name}(time text primary key, stage_name text, method_name text,logs text)")
+    def insert_logs(self,database_name,table_name):
+        pass
+    def show_logs(self,database_name,table_name):
+        return self.session.execute(f"select * from {database_name}.{table_name}")
 
 if __name__=='__main__':
     # args = argparse.ArgumentParser()
@@ -40,5 +44,6 @@ if __name__=='__main__':
     database_name='scania_truck_failures'
     DB=DBOperations()
     DB.establish_connection('nZwsNGMCBZfOFipzdNMzihNf', 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk')
-    DB.create_table(database_name)
+    DB.create_table(database_name,'scania_training')
+
 
