@@ -6,11 +6,6 @@ import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
 # import s3fs
 
-logging_str = "[%(asctime)s: %(levelname)s %(module)s]: %(message)s"
-log_dir = "../../logs"
-
-os.makedirs(log_dir, exist_ok=True)
-logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=logging.INFO, format=logging_str, filemode='a')
 
 
 def get_data(config_path,params_path):
@@ -64,9 +59,6 @@ if __name__ == '__main__':
     parsed_args = args.parse_args()
 
     try:
-        logging.info(">>>>> stage_00_data_loader started")
         get_data(config_path=parsed_args.config, params_path=parsed_args.params)
-        logging.info("stage_00_data_loader completed! All the data are saved in local >>>>>")
     except Exception as e:
-        logging.exception(e)
         raise e
