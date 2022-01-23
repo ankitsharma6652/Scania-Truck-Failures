@@ -35,7 +35,8 @@ data_source:
   Prediction_Batch_Files: Prediction_Batch_Files
 
 
-log_database:
+logs_database:
+  database_name: scania_truck_failures
   training_table_name: scania_training
   prediction_table_name: scania_prediction
 
