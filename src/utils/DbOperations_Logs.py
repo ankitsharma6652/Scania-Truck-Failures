@@ -15,7 +15,7 @@ def unix_time_millis(dt):
     return int(unix_time(dt))*1000
 class DBOperations:
     """
-    This class shall be used to perform the Database operation for the Logs.
+    This class shall be used to perform the Database operation for the Logs and the insert_logs() method will be used to implementing the local logging.
     @author: Ankit Sharma
 
     """
