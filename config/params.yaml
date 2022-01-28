@@ -39,7 +39,8 @@ logs_database:
   database_name: scania_truck_failures
   training_table_name: scania_training
   prediction_table_name: scania_prediction
-
+model_training_thread:
+  model_training_thread_table_name: model_training_thread
 dataset:
   unwanted_column:
     - cd_000

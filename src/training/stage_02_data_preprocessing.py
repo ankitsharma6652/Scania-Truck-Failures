@@ -127,8 +127,8 @@ class preprocessing:
             self.mask = np.triu(np.ones_like(self.corr_matrix, dtype=bool))
             self.tri_df = self.corr_matrix.mask(self.mask)
             self.to_drop = [c for c in self.tri_df.columns if any(self.tri_df[c] > 0.8)]
-            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "remove_highly_corr_features",
-                                     f"Highly Correlated Features - {str(self.df[self.to_drop])}")
+            # self.db_logs.insert_logs(self.training_table_name, self.stage_name, "remove_highly_corr_features",
+            #                          f"Highly Correlated Features - {str([self.to_drop])}")
             self.df_imp_features = self.df.drop(self.df[self.to_drop], axis=1)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "remove_highly_corr_features",
                                      "Highly Correlated Features Removed from the dataset")

@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer,MissingIndicator
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from imblearn import over_sampling
+# from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import pickle as p
 from sklearn.metrics import confusion_matrix,f1_score,log_loss,roc_curve,recall_score,precision_recall_curve,precision_score,fbeta_score
@@ -35,6 +35,7 @@ class ModelTraining:
         self.params = read_yaml(params_path)
         self.database_name = self.params['logs_database']['database_name']
         self.training_table_name = self.params['logs_database']['training_table_name']
+        self.model_training_thread_table_name=self.params['model_training_thread']['model_training_thread_table_name']
         self.user_name = self.config['database']['user_name']
         self.password = self.config['database']['password']
         self.db_logs = DBOperations(self.database_name)
@@ -53,7 +54,7 @@ class ModelTraining:
         self.model_dir=self.model['model']['model_dir']
         self.preprocessed_data_path = os.path.join(self.artifacts_dir, self.preprocessed_data_dir, self.preprocessed_data_file)
         self.target_column_data_path = os.path.join(self.artifacts_dir, self.target_column_data_dir, self.target_column_data_file)
-
+        self.db_logs.model_training_thread(self.model_training_thread_table_name)
     def get_best_params_for_xgboost(self, train_x, train_y):
 
         """
@@ -258,12 +259,15 @@ class ModelTraining:
             #     scaling_object = p.load(std)
             self.best_model_name, self.best_model=self.get_best_model(self.x_train,self.y_train,(self.x_test),self.y_test)
             self.model_dir_path = os.path.join(self.artifacts_dir, self.model_dir,f"{self.best_model_name}.pkl")
+
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"Best Model Saved at : {self.model_dir_path}")
             with open(self.model_dir_path,'wb') as model_file:
                 p.dump(self.best_model,model_file)
+            self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")
+
         except Exception as e:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
