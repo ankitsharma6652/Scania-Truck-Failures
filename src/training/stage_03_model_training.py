@@ -1,6 +1,6 @@
 ### @author: ankitcoolji@gmail.com
 import time
-
+from src.utils.email_sender.email_sender import email_sender
 from sklearn.ensemble import RandomForestClassifier
 import shutil
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
@@ -24,13 +24,14 @@ from sklearn.metrics  import roc_auc_score,accuracy_score
 
 
 class ModelTraining:
-    def __init__(self,config_path,params_path,model_path):
+    def __init__(self,config_path,params_path,model_path,recievers_email:str=None):
         # self.file_object = file_object
         # self.logger_object = logger_object
+        self.email_sender=email_sender()
         self.clf = RandomForestClassifier()
         self.xgb = XGBClassifier()
         self.stage_name= os.path.basename(__file__)[:-3]
-
+        self.recievers_email=recievers_email
         self.config = read_yaml(config_path)
         self.params = read_yaml(params_path)
         self.database_name = self.params['logs_database']['database_name']
@@ -205,11 +206,11 @@ class ModelTraining:
             if self.total_cost_random_forest > self.total_cost_xgboost_model :
                 self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                         "Best Model is Xg-Boost")
-                return "Xg-Boost",self.xgboost
+                return "Xg-Boost",self.xgboost,self.total_cost_xgboost_model
             else:
                 self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                          "Best Model is Random Forest")
-                return "Random Forest", self.random_forest
+                return "Random Forest", self.random_forest,self.total_cost_random_forest
         except Exception as e:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"{e}")
@@ -257,9 +258,17 @@ class ModelTraining:
             # self.get_best_params_for_xgboost(self.x_train,self.y_train)
             # with open(self.standard_scaling_data_path,'rb') as std:
             #     scaling_object = p.load(std)
-            self.best_model_name, self.best_model=self.get_best_model(self.x_train,self.y_train,(self.x_test),self.y_test)
+            self.best_model_name, self.best_model,self.total_cost=self.get_best_model(self.x_train,self.y_train,(self.x_test),self.y_test)
             self.model_dir_path = os.path.join(self.artifacts_dir, self.model_dir,f"{self.best_model_name}.pkl")
-
+            self.mail_text=f"""
+            Congratulations, Model Training  has completed.
+            Please find the below details about the Trained Model-
+            Model Name:{self.best_model_name}
+            Model Saved at : {self.model_dir_path},
+            Total Cost Obtained : {self.total_cost}
+            
+            Please perform prediction.
+            """
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"Best Model Saved at : {self.model_dir_path}")
             with open(self.model_dir_path,'wb') as model_file:
@@ -267,9 +276,11 @@ class ModelTraining:
             self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")
-
+            self.email_sender.send_email(mail_text=self.mail_text,TO=self.recievers_email)
+            print("email sent",self.recievers_email)
         except Exception as e:
             print(e)
+            self.db_logs.update_model_training_thread_status('NS')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"{e}")
             return e

@@ -68,7 +68,7 @@ class DBOperations:
 
     def show_logs(self,table_name):
         try:
-            return self.session.execute(f"select * from {self.database_name}.{table_name} ").all()
+            return self.session.execute(f"select * from {self.database_name}.{table_name} ")
         except Exception as e:
             print(e)
             return e
@@ -109,7 +109,7 @@ if __name__=='__main__':
     database_name='scania_truck_failures'
     DB=DBOperations(database_name)
     DB.establish_connection('nZwsNGMCBZfOFipzdNMzihNf', 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk')
-    # DB.create_table('scania_training')
+    DB.create_table('scania_training')
     # DB.insert_logs('scania_training',"stage_01_data_loader","get_data","1")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "2")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "3")
@@ -118,8 +118,8 @@ if __name__=='__main__':
     # print(DB.show_logs('scania_training'))
     # for i in range(10):
     #     print(test())
-    print(DB.model_training_thread("model_training_thread"))
-    print(DB.model_training_thread_status())
+    # print(DB.model_training_thread("model_training_thread"))
+    # print(DB.model_training_thread_status())
 
 
 

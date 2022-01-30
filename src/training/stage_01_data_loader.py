@@ -9,6 +9,7 @@ from src.utils.DbOperations_Logs import DBOperations
 
 
 def get_data(config_path,params_path):
+    print("Inside Get Data Function")
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
     params = read_yaml(params_path)
