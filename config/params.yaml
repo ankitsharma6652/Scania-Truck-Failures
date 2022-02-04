@@ -3,9 +3,11 @@ base:
   random_state: 42
   test_size: 0.25
   n_components: 90
+
 standard_scalar:
   standard_scale_file_path: standard_scalar_object_dir
   standard_scale_file_name: standard_scaling.pkl
+
 config:
   params: config/params.yaml
   schema_prediction: config/schema_prediction.json
@@ -18,7 +20,7 @@ data_download:
 artifacts:
   training_data:
     master_csv: master.csv
-    null_value_info_file_path:  artifacts/training_data/preprocessing/null_value
+    null_value_info_file_path: artifacts/training_data/preprocessing/null_value
     plots: artifacts/training_data/plots
     scaler_path: artifacts/training_data/preprocessing/scaler
 
@@ -39,8 +41,11 @@ logs_database:
   database_name: scania_truck_failures
   training_table_name: scania_training
   prediction_table_name: scania_prediction
+  testing_table_name: scania_testing
+
 model_training_thread:
   model_training_thread_table_name: model_training_thread
+
 dataset:
   unwanted_column:
     - cd_000
