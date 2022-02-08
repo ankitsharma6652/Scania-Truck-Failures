@@ -1,6 +1,6 @@
 data_source: 
   s3_source_train: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
-  s3_source_test: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
+  source_test: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
   skiprows : 20
 
 database:
@@ -16,10 +16,8 @@ artifacts:
   preprocessed_data_file: preprocessed_training_data.csv
   target_column_data_dir: target_column_data_dir
   target_column_data_file: target_column_training_data.csv
-
-  split_data_dir: split_data_dir
-  train: train.csv
-  test: test.csv
+  preprocessed_test_file: preprocessed_testing_data.csv
+  target_column_testdata_file: target_column_testing_data.csv
 
   model_dir: model_dir
   model_filename: LogisticRegression.model

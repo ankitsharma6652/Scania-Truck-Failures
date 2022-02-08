@@ -294,5 +294,5 @@ if __name__ == '__main__':
     args.add_argument("--model", "-m", default="config/model.yaml")
 
     parsed_args = args.parse_args()
-    model_training=ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
+    model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
     model_training.start_model_training()

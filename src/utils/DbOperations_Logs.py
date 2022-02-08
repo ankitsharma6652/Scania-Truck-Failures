@@ -1,11 +1,12 @@
 #@author:ankitcoolji@gmail.com
-from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 import argparse
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
 import time
 import datetime
 from src.utils import logger
+
+
 def unix_time(dt):
     epoch = datetime.datetime.utcfromtimestamp(0)
     delta = dt - epoch
@@ -21,15 +22,17 @@ class DBOperations:
     """
     def __init__(self,database_name):
         self.database_name=database_name
+
     def get_counter(self):
         global counter
-        counter=counter+1
+        counter = counter + 1
         yield counter
 
     def establish_connection(self,username,password):
         try :
+        
             self.cloud_config = {
-                'secure_connect_bundle': r'D:\Scania-Truck-Failures\artifacts\secure-connect-scania-truck-failures.zip'
+                'secure_connect_bundle': "artifacts/secure-connect-scania-truck-failures.zip"
             }
             self.auth_provider = PlainTextAuthProvider(username,password)
             self.cluster = Cluster(cloud=self.cloud_config, auth_provider=self.auth_provider,protocol_version=4)
@@ -72,6 +75,7 @@ class DBOperations:
         except Exception as e:
             print(e)
             return e
+
     def model_training_thread(self,tablename):
         # result = self.session.execute(
         #     f"select table_name from  system_schema.tables WHERE keyspace_name = '{self.database_name}' and table_name='{tablename}'")
@@ -92,15 +96,18 @@ class DBOperations:
             print(e)
             raise Exception(e)
             return e
+
     def update_model_training_thread_status(self,status):
         self.session.execute(f"update {self.database_name}.model_training_thread set status = '{status}' where id =1")
         return f"Status update to {status}"
+
     def model_training_thread_status(self):
         return self.session.execute(f"select status from {self.database_name}.model_training_thread").one()
 # def test():
 #     global counter
 #     counter=counter+1
 #     return counter
+
 if __name__=='__main__':
     args = argparse.ArgumentParser()
     args.add_argument("--config", "-c", default="config/config.yaml")

@@ -7,6 +7,7 @@ base:
 standard_scalar:
   standard_scale_file_path: standard_scalar_object_dir
   standard_scale_file_name: standard_scaling.pkl
+  standard_scale_predfile_name: standard_scaling_pred.pkl
 
 config:
   params: config/params.yaml
@@ -19,7 +20,6 @@ data_download:
 
 artifacts:
   training_data:
-    master_csv: master.csv
     null_value_info_file_path: artifacts/training_data/preprocessing/null_value
     plots: artifacts/training_data/plots
     scaler_path: artifacts/training_data/preprocessing/scaler
@@ -28,20 +28,14 @@ artifacts:
     model_path: artifacts/model
 
   prediction_data:
-    master_csv: master.csv
     prediction_output_file_path: artifacts/Prediction_Output_DIR/
     prediction_file_name: Predictions.csv
-
-data_source:
-  Training_Batch_Files: Training_Batch_Files
-  Prediction_Batch_Files: Prediction_Batch_Files
 
 
 logs_database:
   database_name: scania_truck_failures
   training_table_name: scania_training
   prediction_table_name: scania_prediction
-  testing_table_name: scania_testing
 
 model_training_thread:
   model_training_thread_table_name: model_training_thread
@@ -52,11 +46,11 @@ dataset:
     - ch_000
 
 
-  database_detail:
-    training_database_name: scania_training
-    prediction_database_name: scania_prediction
-    dataset_training_collection_name: scania_training_dataset
-    dataset_prediction_collection_name: scania_prediction_dataset
+  # database_detail:
+  #   training_database_name: scania_training
+  #   prediction_database_name: scania_prediction
+  #   dataset_training_collection_name: scania_training_dataset
+  #   dataset_prediction_collection_name: scania_prediction_dataset
 
 target_columns:
   columns:
