@@ -45,7 +45,7 @@ class Predictor:
             return prediction_data
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Exception occured in the predictor class.")
-            self-.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Unsuccessful.Exited from the predictor class.")
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Unsuccessful.Exited from the predictor class.")
             raise e
 
     def scale_data(self, data, path, is_dataframe_format_required=False, is_new_scaling=True):
