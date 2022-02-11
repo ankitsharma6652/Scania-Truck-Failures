@@ -20,12 +20,12 @@ data_download:
 
 artifacts:
   training_data:
-    null_value_info_file_path: artifacts/training_data/preprocessing/null_value
-    plots: artifacts/training_data/plots
-    scaler_path: artifacts/training_data/preprocessing/scaler
+    # null_value_info_file_path: artifacts/training_data/preprocessing/null_value
+    # plots: artifacts/training_data/plots
+    scaler_path: artifacts/standard_scalar_object_dir/standard_scaling
 
   model:
-    model_path: artifacts/model
+    model_path: artifacts/model_dir
 
   prediction_data:
     prediction_output_file_path: artifacts/Prediction_Output_DIR/

@@ -27,7 +27,7 @@ class preprocessing:
         self.db_logs = DBOperations(self.database_name)
         self.db_logs.establish_connection(self.user_name, self.password)
         self.db_logs.create_table(self.prediction_table_name)
-        # self.target_column = self.params["target_columns"]['columns']
+        self.target_column = self.params["target_columns"]['columns']
         # self.df = df.drop(columns=self.target_column, inplace=True)
 
     def get_label_column(self, df, label):
@@ -290,11 +290,11 @@ class preprocessing:
             create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
 
             preprocessed_test_file = self.config["artifacts"]["preprocessed_test_file"]
-            target_column_data_file = self.config["artifacts"]["target_column_testdata_file"]
+            target_column_testdata_file = self.config["artifacts"]["target_column_testdata_file"]
             # target_column_data_dir: target_column_data_dir
             # target_column_data_file: target_column_testing_data
             preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_test_file)
-            target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
+            target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_testdata_file)
             standard_scaling_data_path = os.path.join(artifacts_dir, standard_scaling_file_dir,
                                                       standard_scale_predfile_name)
             save_local_df(self.standard_scalar_data, preprocessed_data_path)
