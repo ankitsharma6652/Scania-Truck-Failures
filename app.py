@@ -39,11 +39,6 @@ def scheduler_manager():
 @app.route("/show_training_logs", methods=['GET','POST'])
 @cross_origin()
 def show_training_logs():
-    # args = argparse.ArgumentParser()
-    # args.add_argument("--params", "-p", default="config/params.yaml")
-    # args.add_argument("--config", default="config/config.yaml")
-    # args.add_argument("--model", "-m", default="config/model.yaml")
-    # parsed_args = args.parse_args()
     config = read_yaml("config/config.yaml")
     params = read_yaml("config/params.yaml")
     database_name = params['logs_database']['database_name']
