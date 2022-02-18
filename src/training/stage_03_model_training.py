@@ -33,13 +33,13 @@ from sklearn.metrics  import roc_auc_score,accuracy_score
 
 
 class ModelTraining:
-    def __init__(self,config_path,params_path,model_path):
-        # self.file_object = file_object
-        # self.logger_object = logger_object
-        self.clf = RandomForestClassifier()
-        self.xgb = XGBClassifier()
-        self.config = read_yaml(config_path)
-        self.params = read_yaml(params_path)
+    # def __init__(self,config_path,params_path,model_path):
+    #     # self.file_object = file_object
+    #     # self.logger_object = logger_object
+    #     self.clf = RandomForestClassifier()
+    #     self.xgb = XGBClassifier()
+    #     self.config = read_yaml(config_path)
+    #     self.params = read_yaml(params_path)
     def __init__(self,config_path,params_path,model_path,recievers_email:str=None):
         # self.file_object = file_object
         # self.logger_object = logger_object
@@ -120,11 +120,9 @@ class ModelTraining:
             # self.learning_rate = self.grid.best_params_['learning_rate']
             self.max_depth = self.grid.best_params_['max_depth']
             self.n_estimators = self.grid.best_params_['n_estimators']
-<<<<<<< HEAD
 
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost", f"Got the Best Parameters for XgBoost:{self.max_depth},{self.n_estimators}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
+
             # creating a new model with the best parameters
             self.xgb = XGBClassifier( max_depth=self.max_depth,
                                      n_estimators=self.n_estimators)
@@ -141,11 +139,9 @@ class ModelTraining:
             # self.logger_object.log(self.file_object,
             #                        'XGBoost Parameter tuning  failed. Exited the get_best_params_for_xgboost method of the Model_Finder class')
             print(e)
-<<<<<<< HEAD
-=======
+
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost",
                                      f"{e}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             raise Exception()
 
     def get_best_params_for_random_forest(self,train_x,train_y):
@@ -165,32 +161,23 @@ class ModelTraining:
         try:
             # initializing with different combination of parameters
             self.param_grid = {"n_estimators": [100,200,500,1000,2000],"max_depth": [3,5,10]}
-<<<<<<< HEAD
 
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                      f" Best parameters finding started using Grid Search CV")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             #Creating an object of the Grid Search class
             self.grid = GridSearchCV(estimator=self.clf, param_grid=self.param_grid, cv=5,  verbose=10,scoring='f1')
             #finding the best parameters
             self.grid.fit(train_x, train_y)
-<<<<<<< HEAD
 
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                      f" Best parameters finding  Ended")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             #extracting the best parameters
             # self.criterion = self.grid.best_params_['criterion']
             self.max_depth = self.grid.best_params_['max_depth']
             # self.max_features = self.grid.best_params_['max_features']
             self.n_estimators = self.grid.best_params_['n_estimators']
-<<<<<<< HEAD
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                      f"Got the Best Parameters for Random Forest:{self.max_depth},{self.n_estimators}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             self.clf = RandomForestClassifier(n_estimators=self.n_estimators,
                                           max_depth=self.max_depth)
             # training the mew model
@@ -204,11 +191,8 @@ class ModelTraining:
             # self.logger_object.log(self.file_object,
             #                    'Random Forest Parameter tuning  failed. Exited the get_best_params_for_random_forest method of the Model_Finder class')
             print(e)
-<<<<<<< HEAD
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                     f"{e}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             raise Exception()
     def get_total_cost(self,con_mat):
         print("-" * 117)
@@ -238,11 +222,8 @@ class ModelTraining:
             self.prediction_xgboost = self.xgboost.predict(test_x) # Predictions using the XGBoost Model
             self.y_pred_prob_xgboost= self.xgboost.predict_proba(test_x)[:, 1] > 0.2   # At 0.2, we observe that precision is almost more than 95% and recall is almost around 98%. We want our recall to be near to 100% and at the same time we also want our precision to be high.
             self.con_mat_xgboost = confusion_matrix(test_y, self.y_pred_prob_xgboost)
-<<<<<<< HEAD
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"XgBoost:{self.con_mat_xgboost}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             self.total_cost_xgboost_model=self.get_total_cost(self.con_mat_xgboost)['Total cost']
             # create best model for Random Forest
             self.random_forest = self.get_best_params_for_random_forest(train_x, train_y)
@@ -250,14 +231,11 @@ class ModelTraining:
             self.y_pred_prob_random_forest=self.random_forest.predict_proba(test_x)[:,1]  > 0.30 # At 0.3, we observe that precision is almost more than 95% and recall is almost around 98%. We want our recall to be near to 100% and at the same time we also want our precision to be high.
             self.con_mat_random_forest=confusion_matrix(test_y, self.y_pred_prob_random_forest)
             self.total_cost_random_forest=self.get_total_cost(self.con_mat_random_forest)['Total cost']
-<<<<<<< HEAD
-
             if self.total_cost_random_forest > self.total_cost_xgboost_model :
                 return "Xg-Boost",self.xgboost
             else:
                 return "Random Forest", self.random_forest
         except Exception as e:
-=======
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"Random Forest:{self.con_mat_random_forest}")
             if self.total_cost_random_forest > self.total_cost_xgboost_model :
@@ -271,7 +249,6 @@ class ModelTraining:
         except Exception as e:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"{e}")
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
             print(e)
             raise Exception()
 
@@ -280,7 +257,6 @@ class ModelTraining:
         """
         This class shall be used to empty the model dir
         """
-<<<<<<< HEAD
         shutil.rmtree(os.path.join(self.artifacts_dir, self.model_dir))
 
     def start_model_training(self):
@@ -309,8 +285,6 @@ class ModelTraining:
         with open(self.model_dir_path,'wb') as model_file:
             p.dump(self.best_model,model_file)
 
-
-=======
         try:
             shutil.rmtree(os.path.join(self.artifacts_dir, self.model_dir))
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
@@ -373,7 +347,6 @@ class ModelTraining:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"{e}")
             return e
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
 
 
 if __name__ == '__main__':
@@ -384,9 +357,7 @@ if __name__ == '__main__':
     args.add_argument("--model", "-m", default="config/model.yaml")
 
     parsed_args = args.parse_args()
-<<<<<<< HEAD
     model_training=ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
-=======
+
     model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
->>>>>>> 49740035539e90f24d4417b444c4926532658e2d
     model_training.start_model_training()

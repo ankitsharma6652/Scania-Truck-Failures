@@ -10,7 +10,7 @@ base:
 
 preprocesssing_objects:
   preprocesssing_objects_path: preprocesssing_objects_dir
-  standard_scale_file_name: standard_scaling.pkl
+  standard_scale_file_name: normalizer.pkl
   label_encoding_file_name: label_encoding.pkl
   pca_file_name: pca.pkl
   imputer_file_name: median_imputer.pkl

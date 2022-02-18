@@ -9,18 +9,16 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer, MissingIndicator
 import numpy as np
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler,Normalizer
 from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import logging
 import pickle as p
 
-logging_str = "[%(asctime)s: %(levelname)s %(module)s]: %(message)s"
-log_dir = "preprocessing"
 
-os.makedirs(log_dir, exist_ok=True)
-logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=logging.INFO, format=logging_str,
-                    filemode='a')
+# os.makedirs(log_dir, exist_ok=True)
+# logging.basicConfig(filename=os.path.join(log_dir, "running_logs.log"), level=logging.INFO, format=logging_str,
+#                     filemode='a')
 
 
 class preprocessing:
@@ -44,7 +42,7 @@ class preprocessing:
     #     return target_column
 
     def get_standard_scaling_object(self):
-        return StandardScaler()
+        return Normalizer()
 
     def standard_scaling(self, df):
         """
@@ -178,8 +176,8 @@ class preprocessing:
             self.df_upsampled_pos_class = self.upsampling_postive_class(self.downsampling_neg_class(self.df_remove_highly_correlated_features))
             self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
             # df = self.standard_scaling(self.df_upsampled_pos_class)
-            self.df_after_pca,self.pca_object = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
-            self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_after_pca)
+            # self.df_after_pca,self.pca_object = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
+            self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_upsampled_pos_class)
 
             # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
             preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
@@ -198,8 +196,8 @@ class preprocessing:
             standard_scaling_data_path=os.path.join(artifacts_dir,preprocesssing_objects_file_dir,standard_scale_file_name)
             label_encoding_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                                   label_encoding_file_name)
-            pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
-                                                pca_file_name)
+            # pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
+            #                                     pca_file_name)
             imputer_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                      imputer_file_name)
             save_local_df(self.standard_scalar_data, preprocessed_data_path)
@@ -208,8 +206,8 @@ class preprocessing:
                 p.dump(self.standard_scaling_object,s)
             with open(label_encoding_data_path,'wb') as s:
                 p.dump(self.label_encoding_object,s)
-            with open(pca_data_path,'wb') as s:
-                p.dump(self.pca_object,s)
+            # with open(pca_data_path,'wb') as s:
+            #     p.dump(self.pca_object,s)
             with open(imputer_data_path,'wb') as s:
                 p.dump(self.imputer_object,s)
         except Exception as e:
