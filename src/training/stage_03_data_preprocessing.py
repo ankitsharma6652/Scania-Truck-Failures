@@ -6,7 +6,7 @@ import os
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer,MissingIndicator
 import numpy as np
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.preprocessing import LabelEncoder, StandardScaler , Normalizer
 from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import pickle as p
@@ -17,8 +17,8 @@ def get_label_column(df,label):
 
 
 def get_standard_scaling_object():
-       return StandardScaler()
-
+       # return StandardScaler()
+    return Normalizer()
 def standard_scaling(df):
     """
     Scaling the data points between the range of 0 and 1
