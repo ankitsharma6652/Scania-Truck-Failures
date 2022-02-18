@@ -66,7 +66,7 @@ class preprocessing:
         self.df=df
         self.df_pca = PCA(n_components=n_components, random_state=random_state)
         self.df = self.df_pca.fit_transform(self.df)
-        return pd.DataFrame(self.df)
+        return pd.DataFrame(self.df),self.df_pca
 
     def label_encoding(self, df):
         """encode labels to 0 and 1"""
@@ -75,7 +75,7 @@ class preprocessing:
         # df = self.get_target_column(config_path)
         self.df['class'] = self.le.fit_transform(self.df['class'])
         self.df = self.df.copy()
-        return self.df
+        return self.df,self.le
 
     def remove_highly_corr_featues(self, df):
         """
@@ -155,8 +155,13 @@ class preprocessing:
             local_data_dirs = self.config["artifacts"]['local_data_dirs']
             local_data_train_file = self.config["artifacts"]['local_data_train_file']
             label = self.params["target_columns"]['columns']
-            standard_scaling_file_dir=self.params['standard_scalar']['standard_scale_file_path']
-            standard_scale_file_name=self.params['standard_scalar']['standard_scale_file_name']
+            # standard_scaling_file_dir=self.params['standard_scalar']['standard_scale_file_path']
+            # standard_scale_file_name=self.params['standard_scalar']['standard_scale_file_name']
+            preprocesssing_objects_file_dir = self.params['preprocesssing_objects']['preprocesssing_objects_path']
+            standard_scale_file_name = self.params['preprocesssing_objects']['standard_scale_file_name']
+            label_encoding_file_name=self.params['preprocesssing_objects']['label_encoding_file_name']
+            imputer_file_name=self.params['preprocesssing_objects']['imputer_file_name']
+            pca_file_name=self.params['preprocesssing_objects']['pca_file_name']
             raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
 
             print(raw_local_file_path)
@@ -165,15 +170,15 @@ class preprocessing:
             # print(self.df)
             self.df_after_removing_missing_values_columns=self.remove_missing_values_columns(self.df)
             # print(self.df_after_removing_missing_values_columns)
-            self.df_after_label_encoding = self.label_encoding(self.df_after_removing_missing_values_columns)
+            self.df_after_label_encoding,self.label_encoding_object = self.label_encoding(self.df_after_removing_missing_values_columns)
             # print(self.df_after_label_encoding)
-            self.df_missing_values_handled = self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)[0]
+            self.df_missing_values_handled,self.imputer_object = self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)
             # df = self.handle_missing_values_using_median_imputation(df)
             self.df_remove_highly_correlated_features = self.remove_highly_corr_featues(self.df_missing_values_handled)
             self.df_upsampled_pos_class = self.upsampling_postive_class(self.downsampling_neg_class(self.df_remove_highly_correlated_features))
             self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
             # df = self.standard_scaling(self.df_upsampled_pos_class)
-            self.df_after_pca = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
+            self.df_after_pca,self.pca_object = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
             self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_after_pca)
 
             # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
@@ -182,7 +187,7 @@ class preprocessing:
 
             create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
             create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
-            create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
+            create_directory_path([os.path.join(artifacts_dir, preprocesssing_objects_file_dir)])
 
             preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
             target_column_data_file = self.config["artifacts"]["target_column_data_file"]
@@ -190,12 +195,23 @@ class preprocessing:
             # target_column_data_file: target_column_training_data
             preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
             target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
-            standard_scaling_data_path=os.path.join(artifacts_dir,standard_scaling_file_dir,standard_scale_file_name)
+            standard_scaling_data_path=os.path.join(artifacts_dir,preprocesssing_objects_file_dir,standard_scale_file_name)
+            label_encoding_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
+                                                  label_encoding_file_name)
+            pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
+                                                pca_file_name)
+            imputer_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
+                                     imputer_file_name)
             save_local_df(self.standard_scalar_data, preprocessed_data_path)
             save_local_df(self.target_column, target_column_data_path)
             with open(standard_scaling_data_path,'wb') as s:
                 p.dump(self.standard_scaling_object,s)
-
+            with open(label_encoding_data_path,'wb') as s:
+                p.dump(self.label_encoding_object,s)
+            with open(pca_data_path,'wb') as s:
+                p.dump(self.pca_object,s)
+            with open(imputer_data_path,'wb') as s:
+                p.dump(self.imputer_object,s)
         except Exception as e:
             print(e)
             raise Exception(e)
