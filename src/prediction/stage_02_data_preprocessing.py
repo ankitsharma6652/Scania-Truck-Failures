@@ -1,3 +1,5 @@
+import pickle
+
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 import argparse
 import pandas as pd
@@ -29,6 +31,7 @@ class preprocessing:
         self.db_logs.create_table(self.prediction_table_name)
         self.target_column = self.params["target_columns"]['columns']
         # self.df = df.drop(columns=self.target_column, inplace=True)
+        self.standard_scale_file_name=self.params['preprocesssing_objects']['standard_scale_file_name']
 
     def get_label_column(self, df, label):
         try:
@@ -58,16 +61,24 @@ class preprocessing:
         :return:dataframe after standard scaling and standard scaling object
         @author : Ankit Sharma
         """
-        try :
-            self.std = self.get_standard_scaling_object()
-            self.train_std = self.std.transform(df)
-            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
-                                     "Standard Scaling done on Dataset")
-            return pd.DataFrame(self.train_std, columns=df.columns), self.std
+        # try :
+        #     self.std = self.get_standard_scaling_object()
+        #     self.train_std = self.std.transform(df)
+        #     self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
+        #                              "Standard Scaling done on Dataset")
+        #     return pd.DataFrame(self.train_std, columns=df.columns), self.std
+        # except Exception as e:
+        #     print(e)
+        #     self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
+        #                              f"{e}")
+        #     return e
+        try:
+           with open(self.standard_scale_file_name,'wb') as self.scaler:
+               scaler=pickle.load(self.scaler)
+               self.df=scaler.transform(df)
+               return self.df
+
         except Exception as e:
-            print(e)
-            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
-                                     f"{e}")
             return e
 
 
@@ -277,10 +288,11 @@ class preprocessing:
                 self.downsampling_neg_class(self.df_remove_highly_correlated_features))
             self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
             # df = self.standard_scaling(self.df_upsampled_pos_class)
-            self.df_after_pca = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components,
-                                                                        random_state)
-            self.standard_scalar_data, self.standard_scaling_object = self.standard_scaling(self.df_after_pca)
-
+            # self.df_after_pca = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components,
+            #                                                             random_state)
+            self.standard_scalar_data = self.standard_scaling(self.df_upsampled_pos_class)
+            print("Standard scaling completed")
+            # print(self.standard_scalar_data)
 
             preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
             target_column_data_dir = self.config['artifacts']['target_column_data_dir']
@@ -295,16 +307,16 @@ class preprocessing:
             # target_column_data_file: target_column_testing_data
             preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_test_file)
             target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_testdata_file)
-            standard_scaling_data_path = os.path.join(artifacts_dir, standard_scaling_file_dir,
-                                                      standard_scale_predfile_name)
-            save_local_df(self.standard_scalar_data, preprocessed_data_path)
+            # # standard_scaling_data_path = os.path.join(artifacts_dir, standard_scaling_file_dir,
+            #                                           standard_scale_predfile_name)
+            # # save_local_df(self.standard_scalar_data, preprocessed_data_path)
             save_local_df(self.target_column, target_column_data_path)
-            
-            with open(standard_scaling_data_path, 'wb') as s:
-                p.dump(self.standard_scaling_object, s)
-            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
-                                     "data_preprocessing",
-                                     f"Standard Scaler object file saved at {standard_scaling_data_path}")
+            save_local_df(self.standard_scalar_data,preprocessed_data_path)
+            # with open(standard_scaling_data_path, 'wb') as s:
+            #     p.dump(self.standard_scaling_object, s)
+            # self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
+            #                          "data_preprocessing",
+            #                          f"Standard Scaler object file saved at {standard_scaling_data_path}")
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
                                      "data_preprocessing",
                                      f"Data Preprocessing on Test dataset file saved at : {preprocessed_data_path}")

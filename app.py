@@ -1,5 +1,6 @@
 import argparse
 import smtplib
+import signal
 from email.message import EmailMessage
 from src.utils.email_sender.email_sender import email_sender
 from src.utils.all_utils import read_yaml
@@ -24,7 +25,9 @@ import json, os, signal
 app = Flask(__name__)
 dashboard.bind(app)
 CORS(app)
-
+def signal_handler(sig, frame):
+    print('You pressed Ctrl+C!')
+    sys.exit(0)
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
     return jsonify({ "success": True, "message": "Server is shutting down..." })
@@ -201,10 +204,40 @@ def scheduler(email_address):
 #     return render_template("scheduler_manager.html")
 port = int(os.getenv("PORT",5000))
 if __name__ == "__main__":
-    host = '0.0.0.0'
-    # port = 5000
-    # print(email_address)
-    httpd = simple_server.make_server(host, port, app)
-    # print("Serving on %s %d" % (host, port))
-    httpd.serve_forever()
+    try:
 
+        host = '0.0.0.0'
+        # port = 5000
+        # print(email_address)
+        httpd = simple_server.make_server(host, port, app)
+        # print("Serving on %s %d" % (host, port))
+        httpd.serve_forever()
+        
+        # signal.signal(signal.SIGINT, signal_handler)
+        # print('Press Ctrl+C')
+        # signal.pause()
+    except KeyboardInterrupt as e:
+        pass
+
+    finally:
+        config = read_yaml("config/config.yaml")
+        params = read_yaml("config/params.yaml")
+
+        args = argparse.ArgumentParser()
+        args.add_argument("--params", "-p", default="config/params.yaml")
+        args.add_argument("--config", default="config/config.yaml")
+        args.add_argument("--model", "-m", default="config/model.yaml")
+        parsed_args = args.parse_args()
+        database_name = params['logs_database']['database_name']
+        training_table_name = params['logs_database']['training_table_name']
+        model_training_thread_table_name=params['model_training_thread']['model_training_thread_table_name']
+
+        user_name = config['database']['user_name']
+        password = config['database']['password']
+        db_logs = DBOperations(database_name)
+        db_logs.establish_connection(user_name, password)
+        db_logs.model_training_thread(model_training_thread_table_name)
+        print('Updated Status to NS')
+        # print(request.json)
+        #if request.json['folderPath'] is not None:
+        db_logs.update_model_training_thread_status('NS')

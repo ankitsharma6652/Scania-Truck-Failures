@@ -42,7 +42,7 @@ class preprocessing:
     #     return target_column
 
     def get_standard_scaling_object(self):
-        return Normalizer()
+        return StandardScaler()
 
     def standard_scaling(self, df):
         """
