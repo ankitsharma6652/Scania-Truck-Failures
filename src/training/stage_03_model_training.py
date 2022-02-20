@@ -235,17 +235,17 @@ class ModelTraining:
                 return "Xg-Boost",self.xgboost
             else:
                 return "Random Forest", self.random_forest
-        except Exception as e:
-            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
-                                     f"Random Forest:{self.con_mat_random_forest}")
-            if self.total_cost_random_forest > self.total_cost_xgboost_model :
-                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
-                                        "Best Model is Xg-Boost")
-                return "Xg-Boost",self.xgboost,self.total_cost_xgboost_model
-            else:
-                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
-                                         "Best Model is Random Forest")
-                return "Random Forest", self.random_forest,self.total_cost_random_forest
+        # except Exception as e:
+        #     self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
+        #                              f"Random Forest:{self.con_mat_random_forest}")
+        #     if self.total_cost_random_forest > self.total_cost_xgboost_model :
+        #         self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
+        #                                 "Best Model is Xg-Boost")
+        #         return "Xg-Boost",self.xgboost,self.total_cost_xgboost_model
+        #     else:
+        #         self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
+        #                                  "Best Model is Random Forest")
+        #         return "Random Forest", self.random_forest,self.total_cost_random_forest
         except Exception as e:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"{e}")
@@ -285,22 +285,22 @@ class ModelTraining:
         with open(self.model_dir_path,'wb') as model_file:
             p.dump(self.best_model,model_file)
 
-        try:
-            shutil.rmtree(os.path.join(self.artifacts_dir, self.model_dir))
-            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
-                             f"Deleted the old models in {os.path.join(self.artifacts_dir, self.model_dir)}")
-        except Exception as e:
-            print(e)
-            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
-                                     f"{e}")
-            return e
+        # try:
+        #     shutil.rmtree(os.path.join(self.artifacts_dir, self.model_dir))
+        #     self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
+        #                      f"Deleted the old models in {os.path.join(self.artifacts_dir, self.model_dir)}")
+        # except Exception as e:
+        #     print(e)
+        #     self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
+        #                              f"{e}")
+        #     return e
 
     def start_model_training(self):
         try:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process Started")
             time.sleep(1)
-            self.empty_model_dir()
+            # self.empty_model_dir()
             create_directory_path([os.path.join(self.artifacts_dir, self.model_dir)])
 
             self.training_data=pd.read_csv(self.preprocessed_data_path)

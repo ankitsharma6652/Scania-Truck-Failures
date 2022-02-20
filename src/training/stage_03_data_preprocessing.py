@@ -176,9 +176,9 @@ class preprocessing:
             self.df_upsampled_pos_class = self.upsampling_postive_class(self.downsampling_neg_class(self.df_remove_highly_correlated_features))
             self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
             # df = self.standard_scaling(self.df_upsampled_pos_class)
-            # self.df_after_pca,self.pca_object = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
-            self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_upsampled_pos_class)
-
+            self.df_after_pca,self.pca_object = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components, random_state)
+            self.standard_scalar_data,self.standard_scaling_object=self.standard_scaling(self.df_after_pca)
+            print(self.standard_scalar_data.shape)
             # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
             preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
             target_column_data_dir = self.config['artifacts']['target_column_data_dir']
@@ -196,8 +196,8 @@ class preprocessing:
             standard_scaling_data_path=os.path.join(artifacts_dir,preprocesssing_objects_file_dir,standard_scale_file_name)
             label_encoding_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                                   label_encoding_file_name)
-            # pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
-            #                                     pca_file_name)
+            pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
+                                                pca_file_name)
             imputer_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                      imputer_file_name)
             save_local_df(self.standard_scalar_data, preprocessed_data_path)
@@ -206,8 +206,8 @@ class preprocessing:
                 p.dump(self.standard_scaling_object,s)
             with open(label_encoding_data_path,'wb') as s:
                 p.dump(self.label_encoding_object,s)
-            # with open(pca_data_path,'wb') as s:
-            #     p.dump(self.pca_object,s)
+            with open(pca_data_path,'wb') as s:
+                p.dump(self.pca_object,s)
             with open(imputer_data_path,'wb') as s:
                 p.dump(self.imputer_object,s)
         except Exception as e:

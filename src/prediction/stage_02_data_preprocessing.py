@@ -72,14 +72,16 @@ class preprocessing:
         #     self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
         #                              f"{e}")
         #     return e
+        print(self.standard_scale_file_name)
         try:
-           with open(self.standard_scale_file_name,'wb') as self.scaler:
-               scaler=pickle.load(self.scaler)
-               self.df=scaler.transform(df)
-               return self.df
+            f=open(os.path.join("artifacts/preprocesssing_objects_dir",self.standard_scale_file_name),'rb')
+            scaler=pickle.load(f)
+            self.df=scaler.transform(df)
+            print(df)
+            return self.df
 
         except Exception as e:
-            return e
+            raise Exception(e)
 
 
     def remove_missing_values_columns(self, df):
@@ -216,7 +218,7 @@ class preprocessing:
         @author : Ankit Sharma
         """
         try:
-            self.db_logs.insert_logs(self.predicton_table_name, self.stage_name, "upsampling_postive_class",
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "upsampling_postive_class",
                                      f"upsampling the positive class using smote technique to have balanced dataset.")
             self.df = df
             # Upsampling the positive class using Smote Technique
@@ -292,7 +294,7 @@ class preprocessing:
             #                                                             random_state)
             self.standard_scalar_data = self.standard_scaling(self.df_upsampled_pos_class)
             print("Standard scaling completed")
-            # print(self.standard_scalar_data)
+            print(self.standard_scalar_data)
 
             preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
             target_column_data_dir = self.config['artifacts']['target_column_data_dir']
@@ -311,7 +313,7 @@ class preprocessing:
             #                                           standard_scale_predfile_name)
             # # save_local_df(self.standard_scalar_data, preprocessed_data_path)
             save_local_df(self.target_column, target_column_data_path)
-            save_local_df(self.standard_scalar_data,preprocessed_data_path)
+            # save_local_df(self.standard_scalar_data,preprocessed_data_path)
             # with open(standard_scaling_data_path, 'wb') as s:
             #     p.dump(self.standard_scaling_object, s)
             # self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,

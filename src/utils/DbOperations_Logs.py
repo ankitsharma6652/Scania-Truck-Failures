@@ -116,12 +116,12 @@ if __name__=='__main__':
     database_name='scania_truck_failures'
     DB=DBOperations(database_name)
     DB.establish_connection('nZwsNGMCBZfOFipzdNMzihNf', 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk')
-    DB.create_table('scania_training')
+    DB.create_table('prediction_table_name')
     # DB.insert_logs('scania_training',"stage_01_data_loader","get_data","1")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "2")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "3")
-    # for i in (DB.show_logs('scania_training')):
-    #     print(i)
+    for i in (DB.show_logs('prediction_table_name')):
+        print(i)
     # print(DB.show_logs('scania_training'))
     # for i in range(10):
     #     print(test())
