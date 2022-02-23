@@ -152,7 +152,17 @@
 				</div>
 				<div class="res-container  col-md-6 col-xs-12">
 					<div class="result-box shadow rounded-lg">
-						<h6 class="title">Results</h6>
+						<h6 class="title">Conclusion</h6>
+						Air Pressure System (APS) in trucks generates pressurized air that is used for various functions of trucks such as braking and gear changes. Lot of money is spent on un-necessary checks done by service person on APS system in trucks, which can be prevented by developing a machine learning model that can predict the failure of component in APS. In this way, service can be restricted to the trucks whose APS component is predicted to be failed by the model.
+						<br><br>
+Data is collected from UCI machine learning repository. The dataset consists of data from heavy Scania trucks in everyday usage. There are total 60000 data points in train data and 16000 data points in test data. The datasets positive class consists of component failures for a specific component of the APS system. The negative class consists of trucks with failures for components not related to the APS. There are total 171 features in the data set. The attribute names of the data have been anonymised for proprietary reasons.
+<br><br>
+Challenge Metric:
+<br>
+						<br>
+Total Cost of prediction model = Cost1 * number of False Positives + Cost2 * number of False Negatives. Cost1 - Cost that an un-necessary check needs to be done by an mechanic  Cost2 - Cost of missing a faulty truck, which may cause a breakdown
+<br><br>
+Here, false positives (type 1 error) refer to model predicting failure in APS components even if there is no failure in reality. False Negatives (type2 error) refer to model predicting that there is no failure in APS component even there is failure in reality. Type2 error is very expensive and it may cause break down of truck, hence the cost associated with type2 error is more compared to type1
 						<div class="json-result">
 
 						</div>
