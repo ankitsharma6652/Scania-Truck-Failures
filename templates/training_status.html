@@ -145,17 +145,14 @@
 <!--						</button>-->
 					</form>
 
-					<div class=""><button onclick="window.location.href = '/predict';"class="form-control btn-primary" id="prediction"> Do Prediction again </button></div>
-					<br/><center><b>Or</b></center><br/>
-					<div class=""><button onclick="window.location.href = '/show_prediction_logs';" class="form-control btn-primary" id="prediction_logs">Show Prediction Logs</button></div>
+<!--					<div class=""><button onclick="window.location.href = '/start_training_again';"class="form-control btn-primary" id="training_again"> Start Training Again</button></div>-->
+					<div class=""><button onclick="window.location.href = '/';"class="form-control btn-primary" id="homepage">Homepage</button></div>
 
 				</div>
 				<div class="res-container  col-md-6 col-xs-12">
 					<div class="result-box shadow rounded-lg">
-						<h6 class="title">Results</h6>
-						<h4>Prediction Completed</h4>
-						Prediction file created at : {{prediction_file_location}}
-<!--						Prediction file created at : {{prediction_file_location}}-->
+						<h6 class="title">Status</h6>
+						Model Training is in Progress , Please try again later once you recieved the confirmation email for Model Training Completion.
 						<div class="json-result">
 
 						</div>

@@ -151,6 +151,32 @@ def prediction():
 
         return Response("Error Occurred! %s" % e)
     # return Response("Prediction successful!!")
+@app.route("/training_status", methods=['GET','POST'])
+@cross_origin()
+def start_training_again():
+    # config = read_yaml("config/config.yaml")
+    # params = read_yaml("config/params.yaml")
+    #
+    # args = argparse.ArgumentParser()
+    # args.add_argument("--params", "-p", default="config/params.yaml")
+    # args.add_argument("--config", default="config/config.yaml")
+    # args.add_argument("--model", "-m", default="config/model.yaml")
+    # parsed_args = args.parse_args()
+    # database_name = params['logs_database']['database_name']
+    # training_table_name = params['logs_database']['training_table_name']
+    # model_training_thread_table_name = params['model_training_thread']['model_training_thread_table_name']
+    #
+    # user_name = config['database']['user_name']
+    # password = config['database']['password']
+    # db_logs = DBOperations(database_name)
+    # db_logs.establish_connection(user_name, password)
+    # db_logs.model_training_thread(model_training_thread_table_name)
+    # print('Updated Status to NS')
+    # # print(request.json)
+    # # if request.json['folderPath'] is not None:
+    # db_logs.update_model_training_thread_status('NS')
+    return render_template("homepage.html")
+
 def trainRouteClient(recievers_email):
 
     try:
@@ -232,7 +258,7 @@ def training():
     db_logs.establish_connection(user_name, password)
     db_logs.model_training_thread(model_training_thread_table_name)
     if ('R') in list(db_logs.model_training_thread_status()):
-        return Response("Model Training in Progress, Please try later")
+        return render_template("training_status.html")
     else:
 
         return render_template("model_training.html")
