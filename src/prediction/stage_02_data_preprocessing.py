@@ -81,9 +81,13 @@ class preprocessing:
             scaler=pickle.load(f)
             self.df=scaler.transform(df)
             print(df)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
+                                         "Standard Scaling done on Dataset")
             return pd.DataFrame(self.df,columns=df.columns)
 
         except Exception as e:
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
+                                         e)
             raise Exception(e)
 
 
@@ -113,8 +117,8 @@ class preprocessing:
         try:
             self.df = df
             # self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
-                                    #  "handle_missing_values_using_median_imputation",
-                                    #  f"{e}")
+            #                          "handle_missing_values_using_median_imputation",
+            #                          "")
             # f=open(os.path.join("artifacts/preprocesssing_objects_dir",self.imputer_file_name),'rb')
             self.impute_median=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.imputer_file_name),'rb'))
             self.df=self.impute_median.transform(df)                                   
@@ -190,6 +194,8 @@ class preprocessing:
             self.le=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.label_encoding_file_name),'rb'))
             self.df['class'] = self.le.transform(self.df['class'])
             # self.df=self.le.transform(self.df)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "label_encoding",
+                                     "Converted the categorical values from label column to 0 and 1")
             return self.df
         except Exception as e:
             print(e)

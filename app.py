@@ -6,6 +6,9 @@ from src.utils.all_utils import read_yaml
 from src.training.stage_01_data_loader import get_data
 from src.training.stage_02_data_preprocessing import preprocessing
 from src.training.stage_03_model_training import ModelTraining
+from src.prediction.stage_01_data_loader import get_data as prediction_get_data
+from src.prediction.stage_02_data_preprocessing import preprocessing as prediction_preprocessing
+from src.prediction.stage_03_model_predictor import Predictor
 from wsgiref import simple_server
 from flask import Flask, request, render_template
 from flask import Response
@@ -25,13 +28,27 @@ app = Flask(__name__)
 dashboard.bind(app)
 CORS(app)
 
+
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
     return jsonify({ "success": True, "message": "Server is shutting down..." })
+
+@app.route("/prediction_page", methods=['GET'])
+@cross_origin()
+def prediction_page():
+    return render_template('prediction_page.html')
 @app.route("/", methods=['GET'])
 @cross_origin()
 def home():
-    return render_template('index.html')
+    return render_template('homepage.html')
+
+
+
+
+# @app.route("/", methods=['GET'])
+# @cross_origin()
+# def training():
+#     return render_template('training.html')
 @app.route("/scheduler_manager", methods=['GET'])
 @cross_origin()
 def scheduler_manager():
@@ -59,6 +76,81 @@ def show_training_logs():
     return render_template("show_training_logs.html", len = len(Logs), stage_name=stage_name,time=time,method_name=method_name,Logs = Logs)
 # @app.route("/train", methods=['GET','POST'])
 # @cross_origin()
+@app.route("/show_prediction_logs", methods=['GET','POST'])
+@cross_origin()
+def prediction_logs():
+    config = read_yaml("config/config.yaml")
+    params = read_yaml("config/params.yaml")
+    database_name = params['logs_database']['database_name']
+    # training_table_name = params['logs_database']['training_table_name']
+    prediction_table_name = params['logs_database']['prediction_table_name']
+    user_name = config['database']['user_name']
+    password = config['database']['password']
+    db_logs = DBOperations(database_name)
+    db_logs.establish_connection(user_name, password)
+    stage_name = []
+    time = []
+    method_name = []
+    Logs = []
+    for i in db_logs.show_logs(prediction_table_name):
+        stage_name.append(i[0])
+        time.append(i[1])
+        method_name.append(i[2])
+        Logs.append(i[3])
+    return render_template("show_prediction_logs.html", len = len(Logs), stage_name=stage_name,time=time,method_name=method_name,Logs = Logs)
+@app.route("/predict", methods=['GET','POST'])
+@cross_origin()
+def prediction():
+
+    try:
+        # print("Train Route Client",type(recievers_email))
+        config = read_yaml("config/config.yaml")
+        params = read_yaml("config/params.yaml")
+
+        args = argparse.ArgumentParser()
+        args.add_argument("--params", "-p", default="config/params.yaml")
+        args.add_argument("--config", default="config/config.yaml")
+        args.add_argument("--model", "-m", default="config/model.yaml")
+        parsed_args = args.parse_args()
+        # database_name = params['logs_database']['database_name']
+        # training_table_name = params['logs_database']['training_table_name']
+        # model_training_thread_table_name=params['model_training_thread']['model_training_thread_table_name']
+        #
+        # user_name = config['database']['user_name']
+        # password = config['database']['password']
+        # db_logs = DBOperations(database_name)
+        # db_logs.establish_connection(user_name, password)
+        # db_logs.model_training_thread(model_training_thread_table_name)
+        # print('Updated Status to Running')
+        # print(request.json)
+        #if request.json['folderPath'] is not None:
+        # db_logs.update_model_training_thread_status('R')
+        # get_data(config_path=parsed_args.config, params_path=parsed_args.params)
+        # preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
+        # preprocessing_object.data_preprocessing()
+        # print("Email",request.form['email'])
+        # prediction_get_data(config_path=parsed_args.config, params_path=parsed_args.params)
+        # pred_preprocessing=prediction_preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
+        # pred_preprocessing.data_preprocessing()
+        predictor=Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
+                                           model_path=parsed_args.model)
+        prediction_file_location,df=predictor.predict()
+        return render_template('prediction.html',prediction_file_location=prediction_file_location,sample_output=df,len=(df.shape[0]),df_columns=df.columns)
+
+
+
+    except ValueError:
+
+        return Response("Error Occurred! %s" % ValueError)
+
+    except KeyError:
+
+        return Response("Error Occurred! %s" % KeyError)
+
+    except Exception as e:
+
+        return Response("Error Occurred! %s" % e)
+    # return Response("Prediction successful!!")
 def trainRouteClient(recievers_email):
 
     try:
@@ -146,6 +238,12 @@ def training():
         return render_template("model_training.html")
 # @app.route("/train", methods=['GET','POST'])
 # @cross_origin()
+@app.route("/training_page", methods=['GET'])
+@cross_origin()
+def training_page():
+    return render_template('training.html')
+
+
 def scheduler(email_address):
     config = read_yaml("config/config.yaml")
     params = read_yaml("config/params.yaml")
@@ -173,7 +271,7 @@ def scheduler(email_address):
     print(db_logs.model_training_thread_status())
     if ('R') in list(db_logs.model_training_thread_status()):
         return Response("Model Training in Progress, Please try later")
-        # return render_template("index.html")
+        # return render_template("training.html")
     else:
         print(email_address)
         t1 = threading.Thread(target=trainRouteClient,args=[email_address])

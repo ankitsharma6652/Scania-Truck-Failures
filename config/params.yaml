@@ -37,7 +37,7 @@ artifacts:
     model_path: artifacts/model_dir
 
   prediction_data:
-    prediction_output_file_path: artifacts/Prediction_Output_DIR/
+    prediction_output_file_path: Prediction_Output_DIR/
     prediction_file_name: Predictions.csv
 
 

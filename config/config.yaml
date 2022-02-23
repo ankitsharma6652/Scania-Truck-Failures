@@ -24,6 +24,8 @@ artifacts:
   target_column_data_file: target_column_training_data.csv
   preprocessed_test_file: preprocessed_testing_data.csv
   target_column_testdata_file: target_column_testing_data.csv
+  prediction_dir :
+  prediction_file_name: prediction.csv
 
   # model_dir: model_dir
   # model_filename: LogisticRegression.model
