@@ -3,6 +3,7 @@ import smtplib
 from email.message import EmailMessage
 from src.utils.email_sender.email_sender import email_sender
 from src.utils.all_utils import read_yaml
+from src.utils.KThread import KThread
 from src.training.stage_01_data_loader import get_data
 from src.training.stage_02_data_preprocessing import preprocessing
 from src.training.stage_03_model_training import ModelTraining
@@ -24,10 +25,12 @@ os.putenv('LANG', 'en_US.UTF-8')
 os.putenv('LC_ALL', 'en_US.UTF-8')
 from flask import Flask, jsonify, request
 import json, os, signal
+
 app = Flask(__name__)
 dashboard.bind(app)
 CORS(app)
-
+isAlive=False
+global t1
 
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
@@ -56,6 +59,7 @@ def scheduler_manager():
 @app.route("/show_training_logs", methods=['GET','POST'])
 @cross_origin()
 def show_training_logs():
+    '''This function shall be used to Show Training Logs'''
     config = read_yaml("config/config.yaml")
     params = read_yaml("config/params.yaml")
     database_name = params['logs_database']['database_name']
@@ -79,6 +83,10 @@ def show_training_logs():
 @app.route("/show_prediction_logs", methods=['GET','POST'])
 @cross_origin()
 def prediction_logs():
+    '''
+    This function shall be used to show prediction logs
+    :return:
+    '''
     config = read_yaml("config/config.yaml")
     params = read_yaml("config/params.yaml")
     database_name = params['logs_database']['database_name']
@@ -151,31 +159,46 @@ def prediction():
 
         return Response("Error Occurred! %s" % e)
     # return Response("Prediction successful!!")
-@app.route("/training_status", methods=['GET','POST'])
+@app.route("/start_training_again", methods=['GET','POST'])
 @cross_origin()
-def start_training_again():
-    # config = read_yaml("config/config.yaml")
-    # params = read_yaml("config/params.yaml")
-    #
-    # args = argparse.ArgumentParser()
-    # args.add_argument("--params", "-p", default="config/params.yaml")
-    # args.add_argument("--config", default="config/config.yaml")
-    # args.add_argument("--model", "-m", default="config/model.yaml")
-    # parsed_args = args.parse_args()
-    # database_name = params['logs_database']['database_name']
-    # training_table_name = params['logs_database']['training_table_name']
-    # model_training_thread_table_name = params['model_training_thread']['model_training_thread_table_name']
-    #
-    # user_name = config['database']['user_name']
-    # password = config['database']['password']
-    # db_logs = DBOperations(database_name)
-    # db_logs.establish_connection(user_name, password)
-    # db_logs.model_training_thread(model_training_thread_table_name)
+def training_status():
+    """
+    This function shall be used to show training status on UI and also to kill the running thread if user demands to start the training again
+
+    :return:
+    """
+    config = read_yaml("config/config.yaml")
+    params = read_yaml("config/params.yaml")
+
+    args = argparse.ArgumentParser()
+    args.add_argument("--params", "-p", default="config/params.yaml")
+    args.add_argument("--config", default="config/config.yaml")
+    args.add_argument("--model", "-m", default="config/model.yaml")
+    parsed_args = args.parse_args()
+    database_name = params['logs_database']['database_name']
+    training_table_name = params['logs_database']['training_table_name']
+    model_training_thread_table_name = params['model_training_thread']['model_training_thread_table_name']
+
+    user_name = config['database']['user_name']
+    password = config['database']['password']
+    db_logs = DBOperations(database_name)
+    db_logs.establish_connection(user_name, password)
+    db_logs.model_training_thread(model_training_thread_table_name)
     # print('Updated Status to NS')
-    # # print(request.json)
-    # # if request.json['folderPath'] is not None:
+    # # # print(request.json)
+    # # # if request.json['folderPath'] is not None:
     # db_logs.update_model_training_thread_status('NS')
-    return render_template("homepage.html")
+    if isAlive:
+        if t1.is_alive():
+            t1.kill()
+            print('Updated Status to NS in is_alive block')
+            globals()['isAlive'] = False
+            db_logs.update_model_training_thread_status('NS')
+            return render_template("model_training.html")
+    else:
+        print('Updated Status to NS in else block')
+        db_logs.update_model_training_thread_status('NS')
+        return render_template("model_training.html")
 
 def trainRouteClient(recievers_email):
 
@@ -198,6 +221,8 @@ def trainRouteClient(recievers_email):
         db_logs = DBOperations(database_name)
         db_logs.establish_connection(user_name, password)
         db_logs.model_training_thread(model_training_thread_table_name)
+        db_logs.update_model_training_thread_status('R')
+
         print('Updated Status to Running')
         # print(request.json)
         #if request.json['folderPath'] is not None:
@@ -256,6 +281,8 @@ def training():
     password = config['database']['password']
     db_logs = DBOperations(database_name)
     db_logs.establish_connection(user_name, password)
+    # db_logs.update_model_training_thread_status('NS')
+    # print("Thread is alive",is_alive)
     db_logs.model_training_thread(model_training_thread_table_name)
     if ('R') in list(db_logs.model_training_thread_status()):
         return render_template("training_status.html")
@@ -300,11 +327,25 @@ def scheduler(email_address):
         # return render_template("training.html")
     else:
         print(email_address)
-        t1 = threading.Thread(target=trainRouteClient,args=[email_address])
+        # t1 = threading.Thread(target=trainRouteClient,args=[email_address])
+        # # t2 = threading.Thread(target=home)
+        # print(t1.is_alive())
+        #
+        # # db_logs.update_model_training_thread_status('R')
+        # t1.start()
+        # print("Thread_status",t1.is_alive())
+        # globals()['is_alive']=True
+        # # t2.start()
+        # t1.join(3)
+        # print(request.json)
+        globals()['t1'] = KThread(target=trainRouteClient, args=[email_address])
         # t2 = threading.Thread(target=home)
         print(t1.is_alive())
+
         # db_logs.update_model_training_thread_status('R')
         t1.start()
+        print("Thread_status", t1.is_alive())
+        globals()['isAlive'] = t1.is_alive()
         # t2.start()
         t1.join(3)
         print(request.json)
