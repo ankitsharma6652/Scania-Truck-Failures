@@ -24,14 +24,14 @@ from sklearn.metrics  import roc_auc_score,accuracy_score
 
 
 class ModelTraining:
-    def __init__(self,config_path,params_path,model_path,recievers_email:str=None):
+    def __init__(self,config_path,params_path,model_path):
         # self.file_object = file_object
         # self.logger_object = logger_object
         self.email_sender=email_sender()
         self.clf = RandomForestClassifier()
         self.xgb = XGBClassifier()
         self.stage_name= os.path.basename(__file__)[:-3]
-        self.recievers_email=recievers_email
+        # self.recievers_email=recievers_email
         self.config = read_yaml(config_path)
         self.params = read_yaml(params_path)
         self.database_name = self.params['logs_database']['database_name']
@@ -276,8 +276,9 @@ class ModelTraining:
             self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")
-            self.email_sender.send_email(mail_text=self.mail_text,TO=self.recievers_email)
-            print("email sent",self.recievers_email)
+            # self.email_sender.send_email(mail_text=self.mail_text,TO=self.recievers_email)
+            # print("email sent",self.recievers_email)
+            return self.mail_text
         except Exception as e:
             print(e)
             self.db_logs.update_model_training_thread_status('NS')
