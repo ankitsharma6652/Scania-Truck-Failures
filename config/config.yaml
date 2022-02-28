@@ -4,11 +4,6 @@ data_source:
   test_data: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
   skiprows: 20
 
-  s3_source_train: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_training_set.csv
-  source_test: https://archive.ics.uci.edu/ml/machine-learning-databases/00421/aps_failure_test_set.csv
-  skiprows : 20
-
-
 database:
   user_name: 'nZwsNGMCBZfOFipzdNMzihNf'
   password: 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk'

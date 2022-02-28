@@ -145,32 +145,22 @@
 <!--						</button>-->
 					</form>
 
-					<div class=""><button onclick="window.location.href = '/start_training';"class="form-control btn-primary" id="training">Start Training</button></div>
-					<br/><center><b>Or</b></center><br/>
-					<div class=""><button onclick="window.location.href = '/show_training_logs';" class="form-control btn-primary" id="show_training_logs">Show Training Logs</button></div>
+<!--					<div class=""><button onclick="window.location.href = '/start_training_again';"class="form-control btn-primary" id="training_again"> Start Training Again</button></div>-->
+					<div class=""><button onclick="window.location.href = '/';"class="form-control btn-primary" id="homepage">Homepage</button></div>
 
 				</div>
 				<div class="res-container  col-md-6 col-xs-12">
 					<div class="result-box shadow rounded-lg">
-						<h6 class="title">Problem Statement</h6>
-						The Air Pressure System (APS) is a critical component of a heavy-duty vehicle that uses
-compressed air to force a piston to provide pressure to the brake pads, slowing the vehicle
-down.
-						<br><br>The benefits of using an APS instead of a hydraulic system are the easy availability
-and long-term sustainability of natural air.
-
-						<br><br>This is a Binary Classification problem, in
-which the affirmative class indicates that the failure was caused by a certain component of
-the APS, while the negative class indicates that the failure was caused by something else.
-
-							<br><br>
-						The datasets' positive class consists of component failures for a specific component of the APS system. The negative class consists of trucks with failures for components not related to the APS.
+						<h6 class="title">Email Address Validation</h6>
+						Invalid Email Address , Please enter your email Address again.
 						<div class="json-result">
-							
+<!--							if {{t1}}:-->
+							<div class=""><button onclick="window.location.href = '/start_training';"class="form-control btn-primary" id="email_validation">Enter Email Address</button></div>
+
 						</div>
 					</div>
 				</div>
-			</div>						
+			</div>
 		</div>
 	</section>
 
@@ -192,8 +182,8 @@ the APS, while the negative class indicates that the failure was caused by somet
 			</div>
 		</div>
 	</footer>
-	
-	
+
+
 	<div id="loading"><div class="loader"></div></div>
 	<!-- Bootstrap core JavaScript -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -212,7 +202,7 @@ the APS, while the negative class indicates that the failure was caused by somet
 					type: "POST",
 					data: {filepath:path},
 					success: function(response){
-						$(".json-result").html('<p>"Prediction File created at !!!Prediction_Output_File/Predictions.csvand few of the predictions are"</p><pre>' + response + '</pre>');	
+						$(".json-result").html('<p>"Prediction File created at !!!Prediction_Output_File/Predictions.csvand few of the predictions are"</p><pre>' + response + '</pre>');
 						$('#loading').hide();
 					}
 				});
@@ -231,7 +221,7 @@ the APS, while the negative class indicates that the failure was caused by somet
 						$('#loading').hide();
 					}
 				});
-				
+
 			});
 		});
 	</script>

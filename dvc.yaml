@@ -1,21 +1,81 @@
 stages:
-  load_data:
-    cmd: python src/stage_01_data_loader.py --config=config/config.yaml
+  load_data_train:
+    cmd: python src/training/stage_01_data_loader.py 
+        --config=config/config.yaml 
+        --params=config/params.yaml    
     deps:
-      - src/stage_01_data_loader.py
-      - src/utils/all_utils.py
-      - config/config.yaml
-    outs:
-      - artifacts/local_data_dirs/aps_failure_training_set.csv
-      - artifacts/local_data_dirs/aps_failure_test_set.csv
-
-  split_data:
-    cmd: python src/stage_02_split_data.py --config=config/config.yaml --params=config/params.yaml
-    deps:
-      - src/stage_02_split_data.py
+      - src/training/stage_01_data_loader.py
       - src/utils/all_utils.py
       - config/config.yaml
       - config/params.yaml
     outs:
-      - artifacts/split_data_dir/train.csv
-      - artifacts/split_data_dir/test.csv
+      - artifacts/local_data_dirs/aps_failure_training_set.csv
+     
+  load_data_pred:
+    cmd: python src/prediction/stage_01_data_loader.py
+        --config=config/config.yaml 
+        --params=config/params.yaml   
+    deps:
+      - src/prediction/stage_01_data_loader.py
+      - src/utils/all_utils.py
+      - config/config.yaml
+    outs:
+      - artifacts/local_data_dirs/aps_failure_test_set.csv
+
+  preprocess_train_data:
+    cmd: python src/training/stage_02_data_preprocessing.py
+        --config=config/config.yaml 
+        --params=config/params.yaml
+    deps:
+      - src/training/stage_02_data_preprocessing.py
+      - artifacts/local_data_dirs/aps_failure_training_set.csv
+      - src/utils/all_utils.py
+      - src/utils/DbOperations_Logs.py
+      - config/config.yaml
+      - config/params.yaml
+    outs:
+      - artifacts/preprocessed_data_dir/preprocessed_training_data.csv
+    
+  preprocess_pred_data:
+    cmd: python src/prediction/stage_02_data_preprocessing.py
+        --config=config/config.yaml 
+        --params=config/params.yaml
+    deps:
+      - src/prediction/stage_02_data_preprocessing.py
+      - artifacts/local_data_dirs/aps_failure_test_set.csv
+      - src/utils/all_utils.py
+      - src/utils/DbOperations_Logs.py
+      - config/config.yaml
+      - config/params.yaml
+    outs:
+      - artifacts/preprocessed_data_dir/preprocessed_testing_data.csv  
+
+  model_trainer:
+    cmd: python src/training/stage_03_model_training.py
+        --config=config/config.yaml 
+        --params=config/params.yaml
+    deps:
+      - src/training/stage_03_model_training.py
+      - artifacts/preprocessed_data_dir/preprocessed_training_data.csv
+      - src/utils/all_utils.py
+      - src/utils/DbOperations_Logs.py
+      - config/config.yaml
+      - config/params.yaml
+    outs:
+      - artifacts/model_dir/Xg-Boost.pkl
+
+  model_predictor:
+    cmd: python src/prediction/stage_03_model_predictor.py
+        --config=config/config.yaml 
+        --params=config/params.yaml
+        --model=config/model.yaml
+    deps:
+      - src/prediction/stage_03_model_predictor.py
+      - artifacts/preprocessed_data_dir/preprocessed_testing_data.csv
+      - src/utils/all_utils.py
+      - src/utils/DbOperations_Logs.py
+      - config/config.yaml
+      - config/params.yaml
+      - config/model.yaml
+    outs:
+      - artifacts/Prediction_Output_DIR/Predictions.csv    

@@ -1,15 +1,12 @@
 from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
 import argparse
 import os
-import logging
 import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
-# import s3fs
-
 
 
 def get_data(config_path,params_path):
-    print("Inside Get Data Function")
+    # print("Inside Get Data Function")
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
     params = read_yaml(params_path)
@@ -23,30 +20,25 @@ def get_data(config_path,params_path):
     db_logs.create_table(training_table_name)
     try:
 
-        source_download_train_dirs = config["data_source"]["s3_source_train"]
-        source_download_test_dirs = config["data_source"]["s3_source_test"]
-
+        source_download_train_dirs = config["data_source"]["train_data"]
         # print(database_name)
         db_logs.insert_logs(training_table_name,stage_name,"get_data","Training data downloading start")
         df_train = pd.read_csv(source_download_train_dirs, sep=",",skiprows=range(0,20))
         db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading completed")
-        df_test = pd.read_csv(source_download_test_dirs, sep=",",skiprows=range(0,20))
 
         artifacts_dir = config["artifacts"]['artifacts_dir']
         local_data_dirs = config["artifacts"]['local_data_dirs']
         local_data_train_file = config["artifacts"]['local_data_train_file']
-        local_data_test_file = config["artifacts"]['local_data_test_file']
 
         local_data_dir_path = os.path.join(artifacts_dir, local_data_dirs)
 
         create_directory_path(dirs= [local_data_dir_path ])
 
         local_data_train_file_path = os.path.join(local_data_dir_path , local_data_train_file)
-        local_data_test_file_path = os.path.join(local_data_dir_path , local_data_test_file)
 
         df_train.to_csv(local_data_train_file_path, sep=",", index=False)
         db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data file saved at the Location: {local_data_train_file_path}")
-        df_test.to_csv(local_data_test_file_path, sep=",", index=False)
+        
     except Exception as e:
         print(e)
         db_logs.insert_logs(training_table_name, stage_name, "get_data", f"{e}")
@@ -55,7 +47,7 @@ def get_data(config_path,params_path):
 
 if __name__ == '__main__':
     args = argparse.ArgumentParser()
-    args.add_argument("--params", "-p", default="config/params.yaml")
+    args.add_argument("--params", default="config/params.yaml")
     args.add_argument("--config", default="config/config.yaml")
     parsed_args = args.parse_args()
 

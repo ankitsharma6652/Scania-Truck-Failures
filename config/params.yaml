@@ -34,7 +34,7 @@ artifacts:
     scaler_path: artifacts/standard_scalar_object_dir/standard_scaling
 
   model:
-    model_path: artifacts/model_dir
+    model_path: artifacts/model_dir/Xg-Boost.pkl
 
   prediction_data:
     prediction_output_file_path: Prediction_Output_DIR/
@@ -53,13 +53,6 @@ dataset:
   unwanted_column:
     - cd_000
     - ch_000
-
-
-  # database_detail:
-  #   training_database_name: scania_training
-  #   prediction_database_name: scania_prediction
-  #   dataset_training_collection_name: scania_training_dataset
-  #   dataset_prediction_collection_name: scania_prediction_dataset
 
 target_columns:
   columns:

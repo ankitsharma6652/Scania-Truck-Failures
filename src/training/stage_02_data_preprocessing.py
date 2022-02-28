@@ -1,5 +1,3 @@
-### @author : Ankit Sharma and Devashri Chaudhary
-
 from cProfile import label
 from signal import default_int_handler
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
@@ -235,84 +233,6 @@ class preprocessing:
                                      f"{e}")
             return  e
 
-    # def data_preprocessing(self):
-
-    #     try:
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  "Data Preprocessing Started")
-    #         # config = read_yaml(config_path)
-    #         # params = read_yaml(params_path)
-    #         n_components = self.params['base']['n_components']
-    #         random_state = self.params['base']['random_state']
-
-    #         artifacts_dir = self.config["artifacts"]['artifacts_dir']
-    #         local_data_dirs = self.config["artifacts"]['local_data_dirs']
-    #         local_data_train_file = self.config["artifacts"]['local_data_train_file']
-    #         label = self.params["target_columns"]['columns']
-    #         standard_scaling_file_dir = self.params['standard_scalar']['standard_scale_file_path']
-    #         standard_scale_file_name = self.params['standard_scalar']['standard_scale_file_name']
-    #         raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
-
-    #         print(raw_local_file_path)
-
-    #         self.df = pd.read_csv(raw_local_file_path)
-    #         # print(self.df)
-    #         self.df_after_removing_missing_values_columns = self.remove_missing_values_columns(self.df)
-    #         # print(self.df_after_removing_missing_values_columns)
-    #         self.df_after_label_encoding = self.label_encoding(self.df_after_removing_missing_values_columns)
-    #         # print(self.df_after_label_encoding)
-    #         self.df_missing_values_handled = self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)[0]
-    #         # self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)[0]
-    #         # df = self.handle_missing_values_using_median_imputation(df)
-    #         # self.df_remove_highly_correlated_features = self.remove_highly_corr_features(self.df_missing_values_handled)
-    #         self.df_upsampled_pos_class = self.upsampling_postive_class(
-    #             self.downsampling_neg_class(self.df_missing_values_handled))
-    #         self.target_column = self.get_label_column(self.df_upsampled_pos_class, label)
-    #         # df = self.standard_scaling(self.df_upsampled_pos_class)
-    #         self.df_after_pca = self.dimensionality_reduction_using_pca(self.df_upsampled_pos_class, n_components,
-    #                                                                     random_state)
-    #         self.standard_scalar_data, self.standard_scaling_object = self.standard_scaling(self.df_after_pca)
-
-    #         # train, test = train_test_split(df, test_size=split_ratio, random_state=random_state)
-    #         preprocessed_data_dir = self.config["artifacts"]["preprocessed_data_dir"]
-    #         target_column_data_dir = self.config['artifacts']['target_column_data_dir']
-
-    #         create_directory_path([os.path.join(artifacts_dir, preprocessed_data_dir)])
-    #         create_directory_path([os.path.join(artifacts_dir, target_column_data_dir)])
-    #         create_directory_path([os.path.join(artifacts_dir, standard_scaling_file_dir)])
-
-    #         preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
-    #         target_column_data_file = self.config["artifacts"]["target_column_data_file"]
-    #         # target_column_data_dir: target_column_data_dir
-    #         # target_column_data_file: target_column_training_data
-    #         preprocessed_data_path = os.path.join(artifacts_dir, preprocessed_data_dir, preprocessed_data_file)
-    #         target_column_data_path = os.path.join(artifacts_dir, target_column_data_dir, target_column_data_file)
-    #         standard_scaling_data_path = os.path.join(artifacts_dir, standard_scaling_file_dir,
-    #                                                   standard_scale_file_name)
-    #         save_local_df(self.standard_scalar_data, preprocessed_data_path)
-
-    #         save_local_df(self.target_column, target_column_data_path)
-    #         with open(standard_scaling_data_path, 'wb') as s:
-    #             p.dump(self.standard_scaling_object, s)
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  f"Standard Scaler object file saved at {standard_scaling_data_path}")
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  f"Data Preprocessing file saved at : {preprocessed_data_path}")
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  f"Label Column file saved  at : {target_column_data_path}")
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  "Data Preprocessing Completed")
-    #     except Exception as e:
-    #         print(e)
-    #         self.db_logs.insert_logs(self.training_table_name, self.stage_name,
-    #                                  "data_preprocessing",
-    #                                  f"{e}")
-    #         raise Exception(e)
     def data_preprocessing(self):
 
         try:
@@ -398,10 +318,8 @@ if __name__ == '__main__':
     parsed_args = args.parse_args()
 
     try:
-
         preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
         preprocessing_object.data_preprocessing()
-
 
     except Exception as e:
         raise e

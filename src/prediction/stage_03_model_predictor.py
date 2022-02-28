@@ -109,12 +109,14 @@ class Predictor:
     def load_model(self):
         try:
             # model_path = r'artifacts/model_dir'
-            model_name = os.listdir(self.model_path)
-            # print(*model_name)
-            model_path=(os.path.join(self.model_path, *model_name))
+            # print(self.model_path)
+            # model_name = os.listdir(self.model_path)
+            # print(model_name)
+            # model_path=(os.path.join(self.model_path, model_name))
+            # print(model_path)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
-                                     f"Entered the load_model method of the predictor clas")
-            model= pickle.load(open(model_path,'rb'))
+                                     f"Entered the load_model method of the predictor class")
+            model= pickle.load(open(self.model_path,'rb'))
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
                                      f"Model Loaded successfully")
             return model
@@ -163,7 +165,7 @@ if __name__ == '__main__':
     try:
         predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
         predictor.predict()
-        # predictor.load_model()
+        predictor.load_model()
     except Exception as e:
         raise e
           
