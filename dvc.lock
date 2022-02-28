@@ -7,8 +7,8 @@ stages:
       md5: 1947640b5944a672ca443a225021db6b
       size: 2425
     - path: config/params.yaml
-      md5: a4ab1e0735f4bf092dca4c8df137c3fe
-      size: 1854
+      md5: 932055a325663e38d70d400cd9c77a35
+      size: 1616
     - path: src/training/stage_01_data_loader.py
       md5: 3002d23663d8d3a8ebe36df62d24beea
       size: 2344
@@ -47,21 +47,21 @@ stages:
       md5: 1947640b5944a672ca443a225021db6b
       size: 2425
     - path: config/params.yaml
-      md5: a4ab1e0735f4bf092dca4c8df137c3fe
-      size: 1854
+      md5: 932055a325663e38d70d400cd9c77a35
+      size: 1616
     - path: src/training/stage_02_data_preprocessing.py
       md5: 0a6afa27229ca7c45417bf678fc0f259
       size: 22936
     - path: src/utils/DbOperations_Logs.py
-      md5: 1dc13182efeacd7d50aed155228e459c
-      size: 5478
+      md5: 9b65fbb7f124300d857ac05dbc4a353f
+      size: 5498
     - path: src/utils/all_utils.py
       md5: 909bb77386dd07d8222211f78ea5fee9
       size: 2077
     outs:
     - path: artifacts/preprocessed_data_dir/preprocessed_training_data.csv
-      md5: cfeda7290fa8c38193ca2f1608d1b3ce
-      size: 40018415
+      md5: cb0ce5fdfe2ec67a91f5527247a855e3
+      size: 40025766
   preprocess_pred_data:
     cmd: python src/prediction/stage_02_data_preprocessing.py --config=config/config.yaml
       --params=config/params.yaml
@@ -73,44 +73,73 @@ stages:
       md5: 1947640b5944a672ca443a225021db6b
       size: 2425
     - path: config/params.yaml
-      md5: a4ab1e0735f4bf092dca4c8df137c3fe
-      size: 1854
+      md5: 932055a325663e38d70d400cd9c77a35
+      size: 1616
     - path: src/prediction/stage_02_data_preprocessing.py
       md5: b39687f91dd2f1faf253254120ba294a
       size: 20251
     - path: src/utils/DbOperations_Logs.py
-      md5: 1dc13182efeacd7d50aed155228e459c
-      size: 5478
+      md5: 9b65fbb7f124300d857ac05dbc4a353f
+      size: 5498
     - path: src/utils/all_utils.py
       md5: 909bb77386dd07d8222211f78ea5fee9
       size: 2077
     outs:
     - path: artifacts/preprocessed_data_dir/preprocessed_testing_data.csv
-      md5: 847f800fe20fe5ac0c19b889a2e2264a
-      size: 39992712
+      md5: d1519a2bebdf5968e19aff6866f8202e
+      size: 39987589
   model_trainer:
     cmd: python src/training/stage_03_model_training.py --config=config/config.yaml
       --params=config/params.yaml
     deps:
     - path: artifacts/preprocessed_data_dir/preprocessed_training_data.csv
-      md5: cfeda7290fa8c38193ca2f1608d1b3ce
-      size: 40018415
+      md5: cb0ce5fdfe2ec67a91f5527247a855e3
+      size: 40025766
     - path: config/config.yaml
-      md5: 1947640b5944a672ca443a225021db6b
-      size: 2425
+      md5: 66d441319675290eb8a85333ec1caec6
+      size: 2200
     - path: config/params.yaml
-      md5: a4ab1e0735f4bf092dca4c8df137c3fe
-      size: 1854
+      md5: 932055a325663e38d70d400cd9c77a35
+      size: 1616
     - path: src/training/stage_03_model_training.py
-      md5: 2c5ad98672220b4ee0e03912a6ee1b26
-      size: 39210
+      md5: bea08decebfde6711d9493c6b197c65b
+      size: 58495
     - path: src/utils/DbOperations_Logs.py
-      md5: 1dc13182efeacd7d50aed155228e459c
-      size: 5478
+      md5: 9b65fbb7f124300d857ac05dbc4a353f
+      size: 5498
     - path: src/utils/all_utils.py
       md5: 909bb77386dd07d8222211f78ea5fee9
       size: 2077
     outs:
     - path: artifacts/model_dir/Xg-Boost.pkl
-      md5: ffbd8e31c32a6a29e08cc0262ec3caef
-      size: 1102412
+      md5: 979ae4c4b6f22f87f9a44e17df40fef8
+      size: 1022823
+  model_predictor:
+    cmd: python src/prediction/stage_03_model_predictor.py --config=config/config.yaml
+      --params=config/params.yaml --model=config/model.yaml
+    deps:
+    - path: artifacts/preprocessed_data_dir/preprocessed_testing_data.csv
+      md5: d1519a2bebdf5968e19aff6866f8202e
+      size: 39987589
+    - path: config/config.yaml
+      md5: 66d441319675290eb8a85333ec1caec6
+      size: 2200
+    - path: config/model.yaml
+      md5: ed69b0d3558f4c9eb293f135ca821ce4
+      size: 29
+    - path: config/params.yaml
+      md5: 932055a325663e38d70d400cd9c77a35
+      size: 1616
+    - path: src/prediction/stage_03_model_predictor.py
+      md5: baf07dfa06813826c0792c46d3740551
+      size: 8676
+    - path: src/utils/DbOperations_Logs.py
+      md5: 9b65fbb7f124300d857ac05dbc4a353f
+      size: 5498
+    - path: src/utils/all_utils.py
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
+    outs:
+    - path: artifacts/Prediction_Output_DIR/Predictions.csv
+      md5: 220642d9801ebaff6f31884cf1fbb650
+      size: 36015382
