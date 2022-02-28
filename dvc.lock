@@ -1,43 +1,116 @@
 schema: '2.0'
 stages:
-  load_data:
-    cmd: python src/stage_01_data_loader.py --config=config/config.yaml
+  load_data_train:
+    cmd: python src/training/stage_01_data_loader.py --config=config/config.yaml --params=config/params.yaml
     deps:
     - path: config/config.yaml
-      md5: 3e6f377af43e0721b63b61bb26484e3b
-      size: 3475
-    - path: src/stage_01_data_loader.py
-      md5: a6cb6d9648252bf4b847f769ddbec2b9
-      size: 1907
+      md5: 1947640b5944a672ca443a225021db6b
+      size: 2425
+    - path: config/params.yaml
+      md5: a4ab1e0735f4bf092dca4c8df137c3fe
+      size: 1854
+    - path: src/training/stage_01_data_loader.py
+      md5: 3002d23663d8d3a8ebe36df62d24beea
+      size: 2344
     - path: src/utils/all_utils.py
-      md5: 2e92fb0bd19050395ed25d74296cfa56
-      size: 821
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
+    outs:
+    - path: artifacts/local_data_dirs/aps_failure_training_set.csv
+      md5: 2c8ff50fbea408f2cb9595b14fb7a40a
+      size: 44668322
+  load_data_pred:
+    cmd: python src/prediction/stage_01_data_loader.py --config=config/config.yaml
+      --params=config/params.yaml
+    deps:
+    - path: config/config.yaml
+      md5: 1947640b5944a672ca443a225021db6b
+      size: 2425
+    - path: src/prediction/stage_01_data_loader.py
+      md5: 425ef55a1c240bb9c37f72e412ab4bf1
+      size: 2304
+    - path: src/utils/all_utils.py
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
     outs:
     - path: artifacts/local_data_dirs/aps_failure_test_set.csv
-      md5: 9afabca827bda6c6c1f751351b5f0f81
-      size: 11910399
-    - path: artifacts/local_data_dirs/aps_failure_training_set.csv
-      md5: 81a6720d7170e29280a42bc04671bd49
-      size: 44547982
-  split_data:
-    cmd: python src/stage_02_split_data.py --config=config/config.yaml --params=config/params.yaml
+      md5: 199f005b1272e731555af08be026fd87
+      size: 11942686
+  preprocess_train_data:
+    cmd: python src/training/stage_02_data_preprocessing.py --config=config/config.yaml
+      --params=config/params.yaml
     deps:
+    - path: artifacts/local_data_dirs/aps_failure_training_set.csv
+      md5: 2c8ff50fbea408f2cb9595b14fb7a40a
+      size: 44668322
     - path: config/config.yaml
-      md5: 3e6f377af43e0721b63b61bb26484e3b
-      size: 3475
+      md5: 1947640b5944a672ca443a225021db6b
+      size: 2425
     - path: config/params.yaml
-      md5: 869cd46443760c507d3715a98183c52f
-      size: 1956
-    - path: src/stage_02_split_data.py
-      md5: df257a1fa0816e6e8420cc11bb466d80
-      size: 1712
+      md5: a4ab1e0735f4bf092dca4c8df137c3fe
+      size: 1854
+    - path: src/training/stage_02_data_preprocessing.py
+      md5: 0a6afa27229ca7c45417bf678fc0f259
+      size: 22936
+    - path: src/utils/DbOperations_Logs.py
+      md5: 1dc13182efeacd7d50aed155228e459c
+      size: 5478
     - path: src/utils/all_utils.py
-      md5: 2e92fb0bd19050395ed25d74296cfa56
-      size: 821
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
     outs:
-    - path: artifacts/split_data_dir/test.csv
-      md5: 4a9fa90062a1fb009b2c0ffa8feadd8f
-      size: 13376679
-    - path: artifacts/split_data_dir/train.csv
-      md5: ee167ec7a0b28fdd3fe7619aeb9f5984
-      size: 31172496
+    - path: artifacts/preprocessed_data_dir/preprocessed_training_data.csv
+      md5: cfeda7290fa8c38193ca2f1608d1b3ce
+      size: 40018415
+  preprocess_pred_data:
+    cmd: python src/prediction/stage_02_data_preprocessing.py --config=config/config.yaml
+      --params=config/params.yaml
+    deps:
+    - path: artifacts/local_data_dirs/aps_failure_test_set.csv
+      md5: 199f005b1272e731555af08be026fd87
+      size: 11942686
+    - path: config/config.yaml
+      md5: 1947640b5944a672ca443a225021db6b
+      size: 2425
+    - path: config/params.yaml
+      md5: a4ab1e0735f4bf092dca4c8df137c3fe
+      size: 1854
+    - path: src/prediction/stage_02_data_preprocessing.py
+      md5: b39687f91dd2f1faf253254120ba294a
+      size: 20251
+    - path: src/utils/DbOperations_Logs.py
+      md5: 1dc13182efeacd7d50aed155228e459c
+      size: 5478
+    - path: src/utils/all_utils.py
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
+    outs:
+    - path: artifacts/preprocessed_data_dir/preprocessed_testing_data.csv
+      md5: 847f800fe20fe5ac0c19b889a2e2264a
+      size: 39992712
+  model_trainer:
+    cmd: python src/training/stage_03_model_training.py --config=config/config.yaml
+      --params=config/params.yaml
+    deps:
+    - path: artifacts/preprocessed_data_dir/preprocessed_training_data.csv
+      md5: cfeda7290fa8c38193ca2f1608d1b3ce
+      size: 40018415
+    - path: config/config.yaml
+      md5: 1947640b5944a672ca443a225021db6b
+      size: 2425
+    - path: config/params.yaml
+      md5: a4ab1e0735f4bf092dca4c8df137c3fe
+      size: 1854
+    - path: src/training/stage_03_model_training.py
+      md5: 2c5ad98672220b4ee0e03912a6ee1b26
+      size: 39210
+    - path: src/utils/DbOperations_Logs.py
+      md5: 1dc13182efeacd7d50aed155228e459c
+      size: 5478
+    - path: src/utils/all_utils.py
+      md5: 909bb77386dd07d8222211f78ea5fee9
+      size: 2077
+    outs:
+    - path: artifacts/model_dir/Xg-Boost.pkl
+      md5: ffbd8e31c32a6a29e08cc0262ec3caef
+      size: 1102412
