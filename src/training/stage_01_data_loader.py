@@ -22,9 +22,9 @@ def get_data(config_path,params_path):
 
         source_download_train_dirs = config["data_source"]["train_data"]
         # print(database_name)
-        db_logs.insert_logs(training_table_name,stage_name,"get_data","Training data downloading start")
-        df_train = pd.read_csv(source_download_train_dirs, sep=",",skiprows=range(0,20))
-        db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading completed")
+        # db_logs.insert_logs(training_table_name,stage_name,"get_data","Training data downloading start")
+        # df_train = pd.read_csv(source_download_train_dirs, sep=",",skiprows=range(0,20))
+        # db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading completed")
 
         artifacts_dir = config["artifacts"]['artifacts_dir']
         local_data_dirs = config["artifacts"]['local_data_dirs']
@@ -35,10 +35,16 @@ def get_data(config_path,params_path):
         create_directory_path(dirs= [local_data_dir_path ])
 
         local_data_train_file_path = os.path.join(local_data_dir_path , local_data_train_file)
+        if not os.path.exists(local_data_train_file_path):
+            db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading start")
+            df_train = pd.read_csv(source_download_train_dirs, sep=",", skiprows=range(0, 20))
+            db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading completed")
 
-        df_train.to_csv(local_data_train_file_path, sep=",", index=False)
-        db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data file saved at the Location: {local_data_train_file_path}")
-        
+            df_train.to_csv(local_data_train_file_path, sep=",", index=False)
+            db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data file saved at the Location: {local_data_train_file_path}")
+        else:
+            print("Training Data Already exists")
+            db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data Already exists at location {local_data_train_file_path}")
     except Exception as e:
         print(e)
         db_logs.insert_logs(training_table_name, stage_name, "get_data", f"{e}")
