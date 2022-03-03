@@ -5,6 +5,7 @@ data_source:
   skiprows: 20
 
 database:
+  path: artifacts/secure-connect-scania-truck-failures.zip 
   user_name: 'nZwsNGMCBZfOFipzdNMzihNf'
   password: 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk'
 
@@ -19,14 +20,9 @@ artifacts:
   target_column_data_file: target_column_training_data.csv
   preprocessed_test_file: preprocessed_testing_data.csv
   target_column_testdata_file: target_column_testing_data.csv
-  prediction_dir :
   prediction_file_name: prediction.csv
 
-  # model_dir: model_dir
-  # model_filename: LogisticRegression.model
 
-  reports_dir: reports_dir
-  scores: scores.json 
 
 
 

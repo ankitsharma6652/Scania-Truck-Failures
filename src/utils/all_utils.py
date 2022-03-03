@@ -2,8 +2,6 @@ import yaml
 import os
 import json
 import logging
-import time
-import pandas
 from flask import Flask, request, render_template
 from flask import Response
 import os

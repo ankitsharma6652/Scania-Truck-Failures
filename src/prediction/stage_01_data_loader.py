@@ -38,6 +38,7 @@ def get_data(config_path,params_path):
         print(e)
         db_logs.insert_logs(prediction_table_name, stage_name, "get_data", e)
         return e
+        
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()

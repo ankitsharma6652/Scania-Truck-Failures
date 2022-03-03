@@ -109,7 +109,7 @@ class ModelTraining:
             #                            e))
             # self.logger_object.log(self.file_object,
             #                        'XGBoost Parameter tuning  failed. Exited the get_best_params_for_xgboost method of the Model_Finder class')
-            print(e)
+            
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost",
                                      f"{e}")
             raise Exception()
@@ -158,7 +158,6 @@ class ModelTraining:
             #                        e))
             # self.logger_object.log(self.file_object,
             #                    'Random Forest Parameter tuning  failed. Exited the get_best_params_for_random_forest method of the Model_Finder class')
-            print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                     f"{e}")
             raise Exception()

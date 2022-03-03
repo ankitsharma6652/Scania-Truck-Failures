@@ -33,7 +33,6 @@ executed.
 
 """
 
-
     """A subclass of threading.Thread, with a kill() method."""
     def __init__(self, *args, **keywords):
         threading.Thread.__init__(self, *args, **keywords)
