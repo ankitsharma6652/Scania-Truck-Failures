@@ -21,9 +21,9 @@ def get_data(config_path,params_path):
     try:
 
         source_download_test_dirs = config["data_source"]["test_data"]
-        db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading start")
-        df_test = pd.read_csv(source_download_test_dirs, sep=",", skiprows=range(0, 20))
-        db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading completed")
+        # db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading start")
+        # df_test = pd.read_csv(source_download_test_dirs, sep=",", skiprows=range(0, 20))
+        # db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading completed")
 
         artifacts_dir = config["artifacts"]['artifacts_dir']
         local_data_dirs = config["artifacts"]['local_data_dirs']
@@ -32,8 +32,17 @@ def get_data(config_path,params_path):
 
         create_directory_path(dirs=[local_data_dir_path])
         local_data_test_file_path = os.path.join(local_data_dir_path, local_data_test_file)
-        df_test.to_csv(local_data_test_file_path, sep=",", index=False)
-        db_logs.insert_logs(prediction_table_name, stage_name, "get_data", f"Test file saved at:{local_data_test_file_path}")
+        if not os.path.exists(local_data_test_file_path):
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading start")
+            df_test = pd.read_csv(source_download_test_dirs, sep=",", skiprows=range(0, 20))
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data", "Test data downloading completed")
+            df_test.to_csv(local_data_test_file_path, sep=",", index=False)
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data", f"Test file saved at:{local_data_test_file_path}")
+        else:
+            print("Test Data Exists")
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data",
+                                f"Test file already exists  at location:{local_data_test_file_path}")
+
     except Exception as e:
         print(e)
         db_logs.insert_logs(prediction_table_name, stage_name, "get_data", e)

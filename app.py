@@ -134,8 +134,8 @@ def prediction():
 def training_status():
     
     """
-    This function shall be used to show training status on UI and also to kill 
-    the running thread if user demands to start the training again.
+    This function shall be used to show training status on UI and also to kill the running thread if user demands to start the training again
+    :return:
     """
     config = read_yaml("config/config.yaml")
     params = read_yaml("config/params.yaml")
@@ -192,8 +192,11 @@ def trainRouteClient(recievers_email):
         print('Updated Status to Running')
         db_logs.update_model_training_thread_status('R')
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
-                                           model_path=parsed_args.model,recievers_email=recievers_email)
-        model_training.start_model_training()
+                                           model_path=parsed_args.model)
+        mail_text=model_training.start_model_training()
+        email_sender.send_email(mail_text=mail_text, TO=recievers_email)
+        print("email sent",recievers_email)
+
         stopServer()
 
     except ValueError:
@@ -219,9 +222,12 @@ def start_training():
         email_address = request.form["email"]
         es.set_reciever_mail(email_address)
         print("Reciever's mail",es.get_reciever_mail())
-        scheduler(email_address)
-        return render_template("send_email.html",email_address=email_address)
-
+        if es.validate_email(email_address):
+            es.notify_email(email_address)
+            scheduler(email_address)
+            return render_template("send_email.html",email_address=email_address)
+        else:
+            return render_template("email_address_validator.html")
 @app.route("/start_training", methods=['GET','POST'])
 @cross_origin()
 def training():
@@ -290,5 +296,5 @@ port = int(os.getenv("PORT",5000))
 if __name__ == "__main__":
     host = '0.0.0.0'
     httpd = simple_server.make_server(host, port, app)
+    # print("Serving on %s %d" % (host, port))
     httpd.serve_forever()
-
