@@ -1,2 +1,4 @@
 model:
   model_dir: model_dir
+  random_forest: RandomForest
+  xgboost: Xg-Boost

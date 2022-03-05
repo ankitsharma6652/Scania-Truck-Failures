@@ -31,7 +31,8 @@ class DBOperations:
     def establish_connection(self,username,password):
         try :
             self.cloud_config = {
-                'secure_connect_bundle': r'D:\Data_Science\Scania-Truck-Failures\artifacts\secure-connect-scania-truck-failures.zip'
+                # 'secure_connect_bundle': r'D:\Data_Science\Scania-Truck-Failures\artifacts\secure-connect-scania-truck-failures.zip'
+                'secure_connect_bundle': r'artifacts/secure-connect-scania-truck-failures.zip'
             }
             self.auth_provider = PlainTextAuthProvider(username,password)
             self.cluster = Cluster(cloud=self.cloud_config, auth_provider=self.auth_provider,protocol_version=4)
@@ -48,7 +49,7 @@ class DBOperations:
             print(e)
 
             raise Exception("Error in connection establishment with Database",e)
-            return e
+            # return e
 
     def create_table(self,table_name):
         try:
@@ -56,6 +57,33 @@ class DBOperations:
             # print("Executed Success")
         except Exception as e:
             # print(e)
+            return e
+    def best_model_table(self):
+        try:
+            # self.session.execute(f"drop table {self.database_name}.best_model")
+            return self.session.execute(f"create table if not exists {self.database_name}.best_model(id int primary key,name text )")
+        except Exception as e:
+            print(e)
+            return e
+    def insert_best_model(self,best_model_name):
+        try:
+            query=f"insert into {self.database_name}.best_model (id,name) values(1,'{best_model_name}')"
+            self.session.execute(query)
+        except Exception as e:
+            print(e)
+            return e
+    def update_best_model_name(self,best_model_name):
+        try:
+            query=f"update {self.database_name}.best_model set name = '{best_model_name}' where id=1"
+            self.session.execute(query)
+        except Exception as e:
+            print(e)
+            return e
+    def get_best_model_name(self):
+        try:
+            return tuple(self.session.execute(f"select name from {self.database_name}.best_model").one())[0]
+        except Exception as e:
+            print(e)
             return e
 
     def insert_logs(self,table_name,stage_name,method_name,logs):
@@ -117,7 +145,7 @@ if __name__=='__main__':
     database_name='scania_truck_failures'
     DB=DBOperations(database_name)
     DB.establish_connection('nZwsNGMCBZfOFipzdNMzihNf', 't9UMQhDvW7YNLr5n+B8a_1uabFpthMkGIkla,tT-uaPxlZ-XsBXGaZ5It7Ph6Qc7f58xNvirLKDc+ZZ9Px_b1,eI-Z24mqp_1Ie+uilUGMmsaj9kcrCKiEUAb.dn4JIk')
-    DB.create_table('scania_training')
+    # DB.create_table('scania_training')
     # DB.insert_logs('scania_training',"stage_01_data_loader","get_data","1")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "2")
     # DB.insert_logs('scania_training', "stage_01_data_loader", "get_data", "3")
@@ -128,6 +156,15 @@ if __name__=='__main__':
     #     print(test())
     # print(DB.model_training_thread("model_training_thread"))
     # print(DB.model_training_thread_status())
+    (DB.best_model_table())
+    # if "Xg-Boost" in (DB.get_best_model_name()):
+    #     print('hello')
+    # DB.insert_best_model("Xg-Boost")
+    # print(tuple(DB.get_best_model_name()))
+    DB.update_best_model_name('Xg-Boost')
+    print(tuple(DB.get_best_model_name())[0])
+
+
 
 
 

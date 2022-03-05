@@ -39,6 +39,7 @@ class ModelTraining:
         self.password = self.config['database']['password']
         self.db_logs = DBOperations(self.database_name)
         self.db_logs.establish_connection(self.user_name, self.password)
+        self.db_logs.best_model_table()
         self.model=read_yaml(model_path)
         self.split_ratio = self.params["base"]["test_size"]
         self.random_state = self.params["base"]["random_state"]
@@ -51,6 +52,10 @@ class ModelTraining:
         self.preprocessed_data_file = self.config["artifacts"]["preprocessed_data_file"]
         self.target_column_data_file = self.config["artifacts"]["target_column_data_file"]
         self.model_dir=self.model['model']['model_dir']
+        self.Random_forest = self.model['model']['random_forest']
+        self.Xgboost=self.model['model']['xgboost']
+
+
         self.preprocessed_data_path = os.path.join(self.artifacts_dir, self.preprocessed_data_dir, self.preprocessed_data_file)
         self.target_column_data_path = os.path.join(self.artifacts_dir, self.target_column_data_dir, self.target_column_data_file)
         self.db_logs.model_training_thread(self.model_training_thread_table_name)
@@ -204,11 +209,12 @@ class ModelTraining:
             if self.total_cost_random_forest > self.total_cost_xgboost_model :
                 self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                         "Best Model is Xg-Boost")
-                return "Xg-Boost",self.xgboost,self.total_cost_xgboost_model
+
+                return self.Xgboost,self.xgboost,self.total_cost_xgboost_model
             else:
                 self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                          "Best Model is Random Forest")
-                return "Random Forest", self.random_forest,self.total_cost_random_forest
+                return self.Random_forest, self.random_forest,self.total_cost_random_forest
         except Exception as e:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"{e}")
@@ -267,6 +273,10 @@ class ModelTraining:
             
             Please perform prediction.
             """
+            if self.db_logs.get_best_model_name() is None:
+                self.db_logs.insert_best_model(self.best_model_name)
+            else:
+                self.db_logs.update_best_model_name(best_model_name=self.best_model_name)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"Best Model Saved at : {self.model_dir_path}")
             with open(self.model_dir_path,'wb') as model_file:

@@ -12,7 +12,16 @@ import flask_monitoringdashboard as dashboard
 from email.message import EmailMessage
 
 import smtplib
+import io
+import logging
 
+# # def log_model_summary(model):
+# #     with io.StringIO() as stream:
+# #         model.fit(
+# #             print_fn=lambda x: stream.write(f"{x}\n")
+# #         )
+# #         summary_str = stream.getvalue()
+#     return summary_str
 def read_yaml(config_path: str) -> dict:
     with open(config_path) as yaml_file:
         content = yaml.safe_load(yaml_file)
