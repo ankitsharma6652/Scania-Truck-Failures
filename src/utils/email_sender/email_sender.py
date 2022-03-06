@@ -103,11 +103,12 @@ class email_sender:
             with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
                 smtp.login("digitalaks9@gmail.com", "erdceuisbtejdrtc")
                 smtp.send_message(message)
+                print('Mail sent')
+            return "Mail Sent"
         except Exception as e:
             print(e)
-            raise Exception(e)
-
-
+            # raise Exception(e)
+            return e
 
 
 
