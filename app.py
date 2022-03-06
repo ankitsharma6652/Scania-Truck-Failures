@@ -226,28 +226,30 @@ def trainRouteClient(recievers_email):
         # print(request.json)
         #if request.json['folderPath'] is not None:
         db_logs.update_model_training_thread_status('R')
+        print('Hello world')
         # get_data(config_path=parsed_args.config, params_path=parsed_args.params)
         # preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
         # preprocessing_object.data_preprocessing()
         # print("Email",request.form['email'])
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
                                            model_path=parsed_args.model)
-        mail_text=model_training.start_model_training()
-        email_sender.send_email(mail_text=mail_text, TO=recievers_email)
+        # mail_text=model_training.start_model_training()
+        mail_text='Hello'
+        email_sender().send_email(mail_text=mail_text, TO=recievers_email)
         print("email sent",recievers_email)
 
         stopServer()
 
-    except ValueError:
-
+    except ValueError as e:
+        print(e)
         return Response("Error Occurred! %s" % ValueError)
 
-    except KeyError:
-
+    except KeyError as e:
+        print(e)
         return Response("Error Occurred! %s" % KeyError)
 
     except Exception as e:
-
+        print(e)
         return Response("Error Occurred! %s" % e)
     return Response("Training successful!!")
 @app.route("/train", methods=['GET','POST'])
