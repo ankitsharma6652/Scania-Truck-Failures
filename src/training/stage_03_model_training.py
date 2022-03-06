@@ -292,6 +292,7 @@ class ModelTraining:
             self.db_logs.update_model_training_thread_status('NS')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"{e}")
+            print('e')
             return e
 
 
