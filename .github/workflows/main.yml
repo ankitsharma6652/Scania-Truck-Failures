@@ -39,7 +39,7 @@ jobs:
       # Run our unit tests
       - name: Run unit tests
         run: |
-          python tests/test_application.py
+          python tests/test_script.py
   deploy-to-test:
     # Only run this job if "build" has ended successfully
     needs:
