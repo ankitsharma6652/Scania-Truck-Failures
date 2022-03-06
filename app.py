@@ -26,9 +26,9 @@ os.putenv('LC_ALL', 'en_US.UTF-8')
 from flask import Flask, jsonify, request
 import json, os, signal
 
-app = Flask(__name__)
-dashboard.bind(app)
-CORS(app)
+application = Flask(__name__)
+dashboard.bind(application)
+CORS(application)
 isAlive=False
 global t1
 
@@ -36,11 +36,11 @@ def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
     return jsonify({ "success": True, "message": "Server is shutting down..." })
 
-@app.route("/prediction_page", methods=['GET'])
+@application.route("/prediction_page", methods=['GET'])
 @cross_origin()
 def prediction_page():
     return render_template('prediction_page.html')
-@app.route("/", methods=['GET'])
+@application.route("/", methods=['GET'])
 @cross_origin()
 def home():
     return render_template('homepage.html')
@@ -52,11 +52,11 @@ def home():
 # @cross_origin()
 # def training():
 #     return render_template('training.html')
-@app.route("/scheduler_manager", methods=['GET'])
+@application.route("/scheduler_manager", methods=['GET'])
 @cross_origin()
 def scheduler_manager():
     return render_template('scheduler_manager.html')
-@app.route("/show_training_logs", methods=['GET','POST'])
+@application.route("/show_training_logs", methods=['GET','POST'])
 @cross_origin()
 def show_training_logs():
     '''This function shall be used to Show Training Logs'''
@@ -80,7 +80,7 @@ def show_training_logs():
     return render_template("show_training_logs.html", len = len(Logs), stage_name=stage_name,time=time,method_name=method_name,Logs = Logs)
 # @app.route("/train", methods=['GET','POST'])
 # @cross_origin()
-@app.route("/show_prediction_logs", methods=['GET','POST'])
+@application.route("/show_prediction_logs", methods=['GET','POST'])
 @cross_origin()
 def prediction_logs():
     '''
@@ -106,7 +106,7 @@ def prediction_logs():
         method_name.append(i[2])
         Logs.append(i[3])
     return render_template("show_prediction_logs.html", len = len(Logs), stage_name=stage_name,time=time,method_name=method_name,Logs = Logs)
-@app.route("/predict", methods=['GET','POST'])
+@application.route("/predict", methods=['GET','POST'])
 @cross_origin()
 def prediction():
 
@@ -159,7 +159,7 @@ def prediction():
 
         return Response("Error Occurred! %s" % e)
     # return Response("Prediction successful!!")
-@app.route("/start_training_again", methods=['GET','POST'])
+@application.route("/start_training_again", methods=['GET','POST'])
 @cross_origin()
 def training_status():
     """
@@ -252,7 +252,7 @@ def trainRouteClient(recievers_email):
         print(e)
         return Response("Error Occurred! %s" % e)
     return Response("Training successful!!")
-@app.route("/train", methods=['GET','POST'])
+@application.route("/train", methods=['GET','POST'])
 @cross_origin()
 def start_training():
 
@@ -269,7 +269,7 @@ def start_training():
             return render_template("send_email.html",email_address=email_address)
         else:
             return render_template("email_address_validator.html")
-@app.route("/start_training", methods=['GET','POST'])
+@application.route("/start_training", methods=['GET','POST'])
 @cross_origin()
 def training():
     config = read_yaml("config/config.yaml")
@@ -298,7 +298,7 @@ def training():
         return render_template("model_training.html")
 # @app.route("/train", methods=['GET','POST'])
 # @cross_origin()
-@app.route("/training_page", methods=['GET'])
+@application.route("/training_page", methods=['GET'])
 @cross_origin()
 def training_page():
     return render_template('training.html')
@@ -371,7 +371,7 @@ if __name__ == "__main__":
     host = '0.0.0.0'
     # # port = 5000
     # # print(email_address)
-    httpd = simple_server.make_server(host, port, app)
+    httpd = simple_server.make_server(host, port, application)
     # print("Serving on %s %d" % (host, port))
     httpd.serve_forever()
     # app.run()
