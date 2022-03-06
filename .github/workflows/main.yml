@@ -174,4 +174,4 @@ jobs:
       # Deploy to (or Create) the Elastic Beanstalk environment
       - name: Create test environment & deploy
         run: |
-          (eb use test-environment && eb status scania-truck-env && eb deploy) || eb create scania-truck-env
+          (eb use scania-truck-env && eb status scania-truck-env && eb deploy) || eb create scania-truck-env
