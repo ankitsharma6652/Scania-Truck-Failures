@@ -361,7 +361,7 @@ if __name__ == "__main__":
     host = '0.0.0.0'
     # # port = 5000
     # # print(email_address)
-    # httpd = simple_server.make_server(host, port, application)
-    # # print("Serving on %s %d" % (host, port))
-    # httpd.serve_forever()
-    application.run(debug=True, use_reloader=True)
+    httpd = simple_server.make_server(host, port, application)
+    # print("Serving on %s %d" % (host, port))
+    httpd.serve_forever()
+    # application.run(debug=True, use_reloader=True)
