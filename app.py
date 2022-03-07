@@ -46,12 +46,6 @@ def home():
     return render_template('homepage.html')
 
 
-
-
-# @app.route("/", methods=['GET'])
-# @cross_origin()
-# def training():
-#     return render_template('training.html')
 @application.route("/scheduler_manager", methods=['GET'])
 @cross_origin()
 def scheduler_manager():
@@ -362,16 +356,12 @@ def scheduler(email_address):
 
 
         return render_template("model_training.html")
-# @app.route("/schedule_manager", methods=['GET','POST'])
-# @cross_origin()
-# def schedule_manager():
-#     return render_template("scheduler_manager.html")
 port = int(os.getenv("PORT",5000))
 if __name__ == "__main__":
     host = '0.0.0.0'
     # # port = 5000
     # # print(email_address)
-    httpd = simple_server.make_server(host, port, application)
-    # print("Serving on %s %d" % (host, port))
-    httpd.serve_forever()
-    # app.run()
+    # httpd = simple_server.make_server(host, port, application)
+    # # print("Serving on %s %d" % (host, port))
+    # httpd.serve_forever()
+    application.run(debug=True, use_reloader=True)
