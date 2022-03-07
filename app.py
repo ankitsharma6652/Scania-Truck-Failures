@@ -356,7 +356,7 @@ def scheduler(email_address):
 
 
         return render_template("model_training.html")
-port = int(os.getenv("PORT",5000))
+port = int(os.getenv("PORT",8000))
 if __name__ == "__main__":
     host = '0.0.0.0'
     # # port = 5000
