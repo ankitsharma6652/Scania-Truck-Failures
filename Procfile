@@ -1,1 +1,1 @@
-web: gunicorn app:application -b 0.0.0.0:8000 -w 3
+web: python app.py   --master --processes 4 --threads 2
