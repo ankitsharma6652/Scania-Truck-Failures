@@ -31,7 +31,7 @@ dashboard.bind(application)
 CORS(application)
 isAlive=False
 t1=''
-global t1
+# global t1
 
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
