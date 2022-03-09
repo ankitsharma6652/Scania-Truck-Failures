@@ -30,7 +30,7 @@ application = Flask(__name__)
 dashboard.bind(application)
 CORS(application)
 isAlive=False
-t1=''
+t1=""
 # global t1
 
 def stopServer():
