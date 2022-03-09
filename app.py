@@ -365,3 +365,5 @@ if __name__ == "__main__":
     # print("Serving on %s %d" % (host, port))
     httpd.serve_forever()
     # application.run(debug=True, use_reloader=True)
+# web: gunicorn app:application -b 0.0.0.0:8000 -w 3
+# web: python app.py   --master --processes 4 --threads 2
