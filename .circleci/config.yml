@@ -1,11 +1,11 @@
-ersion: 2.0
+version: 2.1
 orbs:
   heroku: circleci/heroku@1.0.1
 jobs:
   build-and-test:
     executor: heroku/default
     docker:
-      - image: circleci/python:3.7.1-stretch-browsers
+      - image: circleci/python:3.6.2-stretch-browsers
         auth:
           username: mydockerhub-user
           password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
@@ -17,7 +17,7 @@ jobs:
           name: Install Python deps in a venv
           command: |
             echo 'export TAG=0.1.${CIRCLE_BUILD_NUM}' >> $BASH_ENV
-            echo 'export IMAGE_NAME=python-circleci-docker' >> $BASH_ENV
+            echo 'export IMAGE_NAME=${DOCKER_IMAGE_NAME}' >> $BASH_ENV
             python3 -m venv venv
             . venv/bin/activate
             pip install --upgrade pip
@@ -72,4 +72,4 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - main
