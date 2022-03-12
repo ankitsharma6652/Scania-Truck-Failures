@@ -43,7 +43,7 @@ jobs:
             docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$TAG .
             docker login -u $DOCKERHUB_USER -p $DOCKER_HUB_PASSWORD_USER docker.io
             docker push $DOCKERHUB_USER/$IMAGE_NAME:$TAG
-deploy:
+  deploy:
     executor: heroku/default
     steps:
       - checkout
@@ -58,7 +58,6 @@ deploy:
           name: Pushing to heroku registry
           command: |
             heroku container:login
-            #heroku ps:scale web=1 -a $HEROKU_APP_NAME
             heroku container:push web -a $HEROKU_APP_NAME
             heroku container:release web -a $HEROKU_APP_NAME
 
@@ -72,4 +71,4 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - dev
