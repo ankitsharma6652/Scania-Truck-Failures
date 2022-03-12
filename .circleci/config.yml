@@ -43,7 +43,7 @@ jobs:
             docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$TAG .
             docker login -u $DOCKERHUB_USER -p $DOCKER_HUB_PASSWORD_USER docker.io
             docker push $DOCKERHUB_USER/$IMAGE_NAME:$TAG
-  deploy:
+deploy:
     executor: heroku/default
     steps:
       - checkout
