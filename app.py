@@ -135,11 +135,11 @@ def prediction():
         # prediction_get_data(config_path=parsed_args.config, params_path=parsed_args.params)
         # pred_preprocessing=prediction_preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
         # pred_preprocessing.data_preprocessing()
-        # predictor=Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
-        #                                    model_path=parsed_args.model)
-        # prediction_file_location,df=predictor.predict()
-        # return render_template('prediction.html',prediction_file_location=prediction_file_location,sample_output=df,len=(df.shape[0]),df_columns=df.columns)
-        return  "Hello World"
+        predictor=Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
+                                           model_path=parsed_args.model)
+        prediction_file_location,df=predictor.predict()
+        return render_template('prediction.html',prediction_file_location=prediction_file_location,sample_output=df,len=(df.shape[0]),df_columns=df.columns)
+
 
 
     except ValueError:
