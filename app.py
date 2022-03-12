@@ -101,7 +101,7 @@ def prediction_logs():
         method_name.append(i[2])
         Logs.append(i[3])
     return render_template("show_prediction_logs.html", len = len(Logs), stage_name=stage_name,time=time,method_name=method_name,Logs = Logs)
-@application.route("/predict", methods=['GET','POST'])
+@application.route("/predict", methods=['GET'])
 @cross_origin()
 def prediction():
 
