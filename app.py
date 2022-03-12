@@ -222,8 +222,8 @@ def trainRouteClient(recievers_email):
         #if request.json['folderPath'] is not None:
         db_logs.update_model_training_thread_status('R')
         print('Hello world')
-        # get_data(config_path=parsed_args.config, params_path=parsed_args.params)
-        # preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
+        get_data(config_path=parsed_args.config, params_path=parsed_args.params)
+        preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
         # preprocessing_object.data_preprocessing()
         # print("Email",request.form['email'])
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
