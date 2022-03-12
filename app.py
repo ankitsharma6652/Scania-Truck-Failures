@@ -229,11 +229,10 @@ def trainRouteClient(recievers_email):
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
                                            model_path=parsed_args.model)
         mail_text=model_training.start_model_training()
-        mail_text='Hello'
         email_sender().send_email(mail_text=mail_text, TO=recievers_email)
         print("email sent",recievers_email)
 
-        stopServer()
+        # stopServer()
 
     except ValueError as e:
         print(e)
