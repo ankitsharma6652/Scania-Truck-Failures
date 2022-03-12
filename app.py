@@ -224,7 +224,7 @@ def trainRouteClient(recievers_email):
         print('Hello world')
         get_data(config_path=parsed_args.config, params_path=parsed_args.params)
         preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
-        # preprocessing_object.data_preprocessing()
+        preprocessing_object.data_preprocessing()
         # print("Email",request.form['email'])
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
                                            model_path=parsed_args.model)
