@@ -13,6 +13,6 @@ setup(
     author="Devashri Chaudhari and Ankit Sharma",
     author_email="devashrichaudhari@gmail.com,ankitcoolji@gmail.com" ,
     packages=["src"],
-    python_requires=">=3.7",
+    python_requires=">=3.6",
     license="MIT"
 )
