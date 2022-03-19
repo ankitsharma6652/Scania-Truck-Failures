@@ -161,8 +161,8 @@ if __name__=='__main__':
     #     print('hello')
     # DB.insert_best_model("Xg-Boost")
     # print(tuple(DB.get_best_model_name()))
-    DB.update_best_model_name('Xg-Boost')
-    print(tuple(DB.get_best_model_name())[0])
+    # DB.update_best_model_name('Xg-Boost')
+    # print(tuple(DB.get_best_model_name())[0])
 
 
 

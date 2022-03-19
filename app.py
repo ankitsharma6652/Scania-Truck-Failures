@@ -30,8 +30,9 @@ application = Flask(__name__)
 dashboard.bind(application)
 CORS(application)
 isAlive=False
+global t1
 t1=""
-# global t1
+
 
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
@@ -223,13 +224,13 @@ def trainRouteClient(recievers_email):
         db_logs.update_model_training_thread_status('R')
         print('Hello world')
         get_data(config_path=parsed_args.config, params_path=parsed_args.params)
-        preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
-        preprocessing_object.data_preprocessing()
+        # preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
+        # preprocessing_object.data_preprocessing()
         # print("Email",request.form['email'])
-        model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
-                                           model_path=parsed_args.model)
-        mail_text=model_training.start_model_training()
-        email_sender().send_email(mail_text=mail_text, TO=recievers_email)
+        # model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
+        #                                    model_path=parsed_args.model)
+        # mail_text=model_training.start_model_training()
+        # email_sender().send_email(mail_text=mail_text, TO=recievers_email)
         print("email sent",recievers_email)
 
         # stopServer()
