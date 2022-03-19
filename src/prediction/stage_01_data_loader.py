@@ -3,8 +3,9 @@ import argparse
 import os
 import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
+from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
-def get_data(config_path,params_path):
+def get_data(config_path,params_path,local:int=0):
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
     params = read_yaml(params_path)

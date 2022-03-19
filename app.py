@@ -194,7 +194,7 @@ def training_status():
         print('Updated Status to NS in else block')
         db_logs.update_model_training_thread_status('NS')
         return render_template("model_training.html")
-
+    return render_template("model_training.html")
 def trainRouteClient(recievers_email):
 
     try:
