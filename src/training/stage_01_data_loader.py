@@ -6,7 +6,7 @@ from src.utils.DbOperations_Logs import DBOperations
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
 
-def get_data(config_path,params_path,local:int=1):
+def get_data(config_path,params_path):
     # print("Inside Get Data Function")
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
@@ -16,9 +16,15 @@ def get_data(config_path,params_path,local:int=1):
     user_name=config['database']['user_name']
     password=config['database']['password']
     db_logs = DBOperations(database_name)
-    aws = AmazonSimpleStorageService('AKIAXZVACUKMP6ZTKK3E', 'veUIBpOnwohAe5Wc5pGzCMtJfT0u+fsFZFlQsFAc', 'scania-121')
+
+    # aws = AmazonSimpleStorageService('AKIAXZVACUKMP6ZTKK3E', 'veUIBpOnwohAe5Wc5pGzCMtJfT0u+fsFZFlQsFAc', 'scania-121')
+
     db_logs.establish_connection(user_name,password)
+
     db_logs.create_table(training_table_name)
+    access_key, secret_access_key = db_logs.get_aws_s3_keys()
+    aws=AmazonSimpleStorageService(access_key,secret_access_key,config['storage']['bucket_name'])
+
     try:
 
         source_download_train_dirs = config["data_source"]["train_data"]
@@ -42,8 +48,6 @@ def get_data(config_path,params_path,local:int=1):
             db_logs.insert_logs(training_table_name, stage_name, "get_data", "Training data downloading completed")
 
             df_train.to_csv(local_data_train_file_path, sep=",", index=False)
-            # aws.upload_file(local_data_train_file_path)
-            # aws.write_file_content(r'artifacts/local_data_dirs',local_data_train_file_path,df_train)
             db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data file saved at the Location: {local_data_train_file_path}")
         else:
             print("Training Data Already exists")
@@ -51,7 +55,7 @@ def get_data(config_path,params_path,local:int=1):
             db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training data Already exists at location {local_data_train_file_path}")
         # print(local_data_dir_path,local_data_train_file)
         # print(aws.is_file_present(local_data_dir_path.replace("\\","/"),local_data_train_file))
-        if not  aws.is_file_present(local_data_dir_path.replace("\\","/"),local_data_train_file):
+        if not  aws.is_file_present(local_data_dir_path.replace("\\","/"),local_data_train_file)['status']:
             db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Training dataset uploaded to s3 storage at location {local_data_train_file_path}")
 
             aws.upload_file(local_data_dir_path.replace("\\","/"),local_data_train_file,local_data_train_file,local_file_path=local_data_train_file_path)

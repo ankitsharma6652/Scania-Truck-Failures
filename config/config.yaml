@@ -29,7 +29,8 @@ artifacts:
   scores: scores.json 
 
 
-
+storage:
+  bucket_name: scania-121
 
 
 

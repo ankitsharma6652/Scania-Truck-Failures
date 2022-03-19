@@ -131,6 +131,11 @@ class DBOperations:
 
     def model_training_thread_status(self):
         return self.session.execute(f"select status from {self.database_name}.model_training_thread").one()
+    def get_aws_s3_keys(self):
+        ''' This class shall be used to retrieve access keys and secret access keys for aws s3 storage from table secrets
+        '''
+
+        return tuple(self.session.execute(f"select access_key,secret_access_key from {self.database_name}.secrets where id =1").one())
 
 # def test():
 #     global counter
@@ -163,6 +168,7 @@ if __name__=='__main__':
     # print(tuple(DB.get_best_model_name()))
     # DB.update_best_model_name('Xg-Boost')
     # print(tuple(DB.get_best_model_name())[0])
+    print(DB.get_aws_s3_keys())
 
 
 
