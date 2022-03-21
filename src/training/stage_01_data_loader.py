@@ -23,6 +23,7 @@ def get_data(config_path,params_path):
 
     db_logs.create_table(training_table_name)
     access_key, secret_access_key = db_logs.get_aws_s3_keys()
+    print(access_key,secret_access_key)
     aws=AmazonSimpleStorageService(access_key,secret_access_key,config['storage']['bucket_name'])
 
     try:

@@ -19,7 +19,7 @@ from sklearn.model_selection import GridSearchCV
 from xgboost import XGBClassifier
 from src.utils.DbOperations_Logs import DBOperations
 from sklearn.metrics  import roc_auc_score,accuracy_score
-
+from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
 class ModelTraining:
     def __init__(self,config_path,params_path,model_path):
@@ -55,7 +55,8 @@ class ModelTraining:
         self.Random_forest = self.model['model']['random_forest']
         self.Xgboost=self.model['model']['xgboost']
 
-
+        access_key, secret_access_key = self.db_logs.get_aws_s3_keys()
+        self.aws = AmazonSimpleStorageService(access_key, secret_access_key, self.config['storage']['bucket_name'])
         self.preprocessed_data_path = os.path.join(self.artifacts_dir, self.preprocessed_data_dir, self.preprocessed_data_file)
         self.target_column_data_path = os.path.join(self.artifacts_dir, self.target_column_data_dir, self.target_column_data_file)
         self.db_logs.model_training_thread(self.model_training_thread_table_name)
@@ -244,10 +245,11 @@ class ModelTraining:
             # self.empty_model_dir()
             create_directory_path([os.path.join(self.artifacts_dir, self.model_dir)])
 
-            self.training_data=pd.read_csv(self.preprocessed_data_path)
-            self.target_column_data=pd.read_csv(self.target_column_data_path).iloc[:,0]
+            # self.training_data=pd.read_csv(self.preprocessed_data_path)
+            # self.target_column_data=pd.read_csv(self.target_column_data_path).iloc[:,0]
             # print(type(self.target_column_data.iloc[0]))
-
+            self.training_data=self.aws.read_csv_file(os.path.join(self.artifacts_dir, self.preprocessed_data_dir).replace('\\','/'), self.preprocessed_data_file)['data_frame']
+            self.target_column_data = self.aws.read_csv_file(os.path.join(self.artifacts_dir, self.target_column_data_dir).replace('\\','/'), self.target_column_data_file)['data_frame'].iloc[:, 0]
             self.x_train,self.x_test,self.y_train,self.y_test=train_test_split(self.training_data,self.target_column_data,test_size=self.split_ratio, random_state=self.random_state)
             print(f"x train shape:{self.x_train.shape}")
             print(f"y train shape:{self.y_train.shape}")
@@ -281,6 +283,9 @@ class ModelTraining:
                                      f"Best Model Saved at : {self.model_dir_path}")
             with open(self.model_dir_path,'wb') as model_file:
                 p.dump(self.best_model,model_file)
+            self.aws.upload_file(os.path.join(self.artifacts_dir, self.model_dir).replace("\\",'/'),f"{self.best_model_name}.pkl",over_write=True)
+            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
+                                     f"Model training file uploaded to the S3 at location {model_dir_path}")
             self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")

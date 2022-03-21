@@ -7,7 +7,7 @@ from src.utils.KThread import KThread
 from src.training.stage_01_data_loader import get_data
 from src.training.stage_02_data_preprocessing import preprocessing
 from src.training.stage_03_model_training import ModelTraining
-from src.prediction.stage_01_data_loader import get_data as prediction_get_data
+# from src.prediction.stage_01_data_loader import get_data as prediction_get_data
 from src.prediction.stage_02_data_preprocessing import preprocessing as prediction_preprocessing
 from src.prediction.stage_03_model_predictor import Predictor
 from wsgiref import simple_server
@@ -223,14 +223,14 @@ def trainRouteClient(recievers_email):
         #if request.json['folderPath'] is not None:
         db_logs.update_model_training_thread_status('R')
         print('Hello world')
-        get_data(config_path=parsed_args.config, params_path=parsed_args.params)
+        # get_data(config_path=parsed_args.config, params_path=parsed_args.params)
         # preprocessing_object = preprocessing(config_path=parsed_args.config, params_path=parsed_args.params)
         # preprocessing_object.data_preprocessing()
         # print("Email",request.form['email'])
-        # model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
-        #                                    model_path=parsed_args.model)
-        # mail_text=model_training.start_model_training()
-        # email_sender().send_email(mail_text=mail_text, TO=recievers_email)
+        model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
+                                           model_path=parsed_args.model)
+        mail_text=model_training.start_model_training()
+        email_sender().send_email(mail_text=mail_text, TO=recievers_email)
         print("email sent",recievers_email)
 
         # stopServer()

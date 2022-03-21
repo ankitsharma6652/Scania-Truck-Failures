@@ -13,7 +13,8 @@ from sklearn.decomposition import PCA
 import logging
 import pickle as p
 from src.utils.DbOperations_Logs import DBOperations
-
+from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
+from pathlib import  Path
 class preprocessing:
     """ This class is for doing preprocessing on dataset"""
 
@@ -30,7 +31,8 @@ class preprocessing:
         self.db_logs.create_table(self.training_table_name)
         # self.target_column = self.params["target_columns"]['columns']
         # self.df = df.drop(columns=self.target_column, inplace=True)
-
+        access_key, secret_access_key = self.db_logs.get_aws_s3_keys()
+        self.aws = AmazonSimpleStorageService(access_key, secret_access_key, self.config['storage']['bucket_name'])
     def get_label_column(self, df, label):
         try:
             self.target_column = df[label]
@@ -253,11 +255,14 @@ class preprocessing:
             imputer_file_name=self.params['preprocesssing_objects']['imputer_file_name']
             pca_file_name=self.params['preprocesssing_objects']['pca_file_name']
             raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_train_file)
-
-            print(raw_local_file_path)
-
-            self.df = pd.read_csv(raw_local_file_path)
-            # print(self.df)
+            raw_training_file=(os.path.join(artifacts_dir,local_data_dirs)).replace('\\','/')
+            # print(raw_local_file_path)
+            # self.df = pd.read_csv(raw_local_file_path) # Local File
+            print((raw_training_file,local_data_train_file))
+            self.df = self.aws.read_csv_file(raw_training_file,local_data_train_file)['data_frame'] # Reading Data from S3 Storage
+            self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                 "Successfully the read the training dataset from s3 Storage")
+            print(self.df)
             self.df_after_removing_missing_values_columns=self.remove_missing_values_columns(self.df)
             # print(self.df_after_removing_missing_values_columns)
             self.df_after_label_encoding,self.label_encoding_object = self.label_encoding(self.df_after_removing_missing_values_columns)
@@ -289,19 +294,84 @@ class preprocessing:
             label_encoding_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                                   label_encoding_file_name)
             pca_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
-                                                pca_file_name)
+                                               pca_file_name)
             imputer_data_path = os.path.join(artifacts_dir, preprocesssing_objects_file_dir,
                                      imputer_file_name)
             save_local_df(self.standard_scalar_data, preprocessed_data_path)
+            if not self.aws.is_file_present(os.path.join(artifacts_dir, preprocessed_data_dir).replace('\\','/'),preprocessed_data_file)['status']:
+                "Uploading the preprocessed data to the S3 Storage if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir, preprocessed_data_dir).replace('\\','/'),preprocessed_data_file,preprocessed_data_file,local_file_path=preprocessed_data_path,over_write=True)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                        "Preprocessed data already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name,self.stage_name,"data_preprocessing","Uploaded the preproceesed training data to the s3 storage")
+            print(os.path.join(artifacts_dir, preprocessed_data_dir))
+
+            # self.aws.upload_file()
             save_local_df(self.target_column, target_column_data_path)
+            if not self.aws.is_file_present(os.path.join(artifacts_dir, target_column_data_dir).replace('\\', '/'),
+                                        target_column_data_file)['status']:
+                "Uploading the Target column data to the S3 Storage if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir, target_column_data_dir).replace('\\', '/'),
+                                     target_column_data_file, target_column_data_file,
+                                     local_file_path=target_column_data_path)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                         "Traget Training data already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                         "Uploaded the Target training data to the s3 storage")
             with open(standard_scaling_data_path,'wb') as s:
                 p.dump(self.standard_scaling_object,s)
+            if not  self.aws.is_file_present(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                            standard_scale_file_name)['status']:
+                "Uploading the standard scaling object file to S3 if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir,preprocesssing_objects_file_dir).replace('\\','/'),
+                                     standard_scale_file_name,standard_scale_file_name,local_file_path=standard_scaling_data_path,over_write=True)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                    "Standard scaling object file already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                     "Uploaded the Standard scaling object file to the s3 storage")
             with open(label_encoding_data_path,'wb') as s:
                 p.dump(self.label_encoding_object,s)
+            if not self.aws.is_file_present(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                            label_encoding_file_name)['status']:
+                "Uploading the Label encoding  object file to S3 if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                     label_encoding_file_name, label_encoding_file_name,
+                                     local_file_path=label_encoding_data_path,over_write=True)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                "Label encoding  object file already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                 "Uploaded the SLabel encoding  object file to the s3 storage")
             with open(pca_data_path,'wb') as s:
                 p.dump(self.pca_object,s)
+            if not self.aws.is_file_present(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                            pca_file_name)['status']:
+                "Uploading the PCA  object file to S3 if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                     pca_file_name, pca_file_name,
+                                     local_file_path=pca_data_path,over_write=True)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                 "PCA object file already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                 "Uploaded the PCA object file to the s3 storage")
             with open(imputer_data_path,'wb') as s:
                 p.dump(self.imputer_object,s)
+            if  not self.aws.is_file_present(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                            pca_file_name)['status']:
+                "Uploading the Imputer file  object file to S3 if not exists"
+                self.aws.upload_file(os.path.join(artifacts_dir, preprocesssing_objects_file_dir).replace('\\', '/'),
+                                     imputer_file_name, imputer_file_name,
+                                     local_file_path=imputer_data_path,over_write=True)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                         "Median imputation  object file already exists in s3 storage")
+            else:
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "data_preprocessing",
+                                         "Uploaded the Median imputation  object file to the s3 storage")
+
         except Exception as e:
             print(e)
             raise Exception(e)
