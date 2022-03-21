@@ -285,7 +285,7 @@ class ModelTraining:
                 p.dump(self.best_model,model_file)
             self.aws.upload_file(os.path.join(self.artifacts_dir, self.model_dir).replace("\\",'/'),f"{self.best_model_name}.pkl",over_write=True)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
-                                     f"Model training file uploaded to the S3 at location {model_dir_path}")
+                                     f"Model training file uploaded to the S3 at location {self.model_dir_path}")
             self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")
