@@ -51,7 +51,7 @@ def get_data(config_path,params_path):
 
             aws.upload_file(os.path.join(artifacts_dir, local_data_dirs).replace("\\","/"),local_data_test_file,local_data_test_file,local_file_path=local_data_test_file_path)
         else:
-            db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Test dataset Already exists in s3 storage at location {local_data_test_file_path}")
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data", f"Test dataset Already exists in s3 storage at location {local_data_test_file_path}")
     except Exception as e:
         print(e)
         db_logs.insert_logs(prediction_table_name, stage_name, "get_data", e)
