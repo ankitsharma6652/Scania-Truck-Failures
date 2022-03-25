@@ -9,7 +9,8 @@ import sys, os
 import dill
 import io
 import pandas as pd
-
+import pickle
+from io import BytesIO
 class AmazonSimpleStorageService:
 
     def __init__(self, access_key_id,secret_access_key, bucket_name,region_name=None):
@@ -549,7 +550,34 @@ class AmazonSimpleStorageService:
                     .format(AmazonSimpleStorageService.__module__.__str__(), AmazonSimpleStorageService.__name__,
                             self.read_file_content.__name__))
             raise Exception(aws_exception.error_message_detail(str(e), sys)) from e
+    def get_pickle_file(self, directory_full_path, file_name):
+        """
 
+        :param directory_full_path: directory_full_path
+        :param file_name: file_name
+        :return: {'status': True/False, 'message': 'message_detail',
+                    'file_content':'If status True then Return object which was used to generate the file with write file content'}
+        """
+        try:
+            directory_full_path = self.update_directory_full_path_string(directory_full_path)
+            response = self.is_file_present(directory_full_path, file_name)
+            if not response['status']:
+                return response
+            # content = io.BytesIO()
+            # self.client.download_fileobj(self.bucket_name, directory_full_path + file_name, content)
+            with BytesIO() as data:
+                self.resource.Bucket(self.bucket_name).download_fileobj(directory_full_path + file_name, data)
+                data.seek(0)
+                # return pickle.load(data)
+                # scaler = pickle.load(data)
+                return {'status': True, 'message': 'File [{0}] has been read'.format(directory_full_path + file_name),
+                    'file_content': pickle.load(data)}
+        except Exception as e:
+            aws_exception = AWSException(
+                "Failed to create file with content in module [{0}] class [{1}] method [{2}]"
+                    .format(AmazonSimpleStorageService.__module__.__str__(), AmazonSimpleStorageService.__name__,
+                            self.read_file_content.__name__))
+            raise Exception(aws_exception.error_message_detail(str(e), sys)) from e
     def move_file(self, source_directory_full_path, target_directory_full_path, file_name, over_write=False,
                   bucket_name=None):
         """
