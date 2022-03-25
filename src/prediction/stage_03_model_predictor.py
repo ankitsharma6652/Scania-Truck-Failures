@@ -186,7 +186,7 @@ from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 from sklearn.preprocessing import StandardScaler
 from src.utils.DbOperations_Logs import DBOperations
 import pickle
-
+from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 class Predictor:
 
     def __init__(self, config_path, params_path, model_path):
@@ -219,15 +219,18 @@ class Predictor:
         self.xgboost=self.model['model']['xgboost']
         self.artifacts_dir = self.config["artifacts"]['artifacts_dir']
         self.db_logs.best_model_table()
-
+        access_key, secret_access_key = self.db_logs.get_aws_s3_keys()
+        self.aws = AmazonSimpleStorageService(access_key, secret_access_key, self.config['storage']['bucket_name'])
 
     def get_data(self):
         """This method reads the data for prediction from  source."""
         self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Entered the get_data method of the predictor class.")
         try:
-            prediction_data = pd.read_csv(self.preprocessed_data_path)
+            # prediction_data = pd.read_csv(self.preprocessed_data_path)
+            prediction_data=self.aws.read_csv_file(os.path.join(self.artifacts_dir, self.preprocessed_data_dir).replace("\\","/"),self.preprocessed_test_file)['data_frame']
+            print("File loaded successfully")
             # self.target_column_data = pd.read_csv(self.target_column_data_path).iloc[:,0]
-            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Successful.Exited from the get_data method of the predictor class.")
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Successful from S3 STorage.Exited from the get_data method of the predictor class.")
             return prediction_data
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Exception occured in the predictor class.")
@@ -301,9 +304,17 @@ class Predictor:
             get_model_name_from_db=self.db_logs.get_best_model_name()
             # print(get_model_name_from_db)
             # print(self.model_path)
-            if get_model_name_from_db+".pkl" in os.listdir(self.model_path):
+            # if get_model_name_from_db+".pkl" in os.listdir(self.model_path):
+            #
+            #     model= pickle.load(open(os.path.join(self.model_path,get_model_name_from_db+".pkl"),'rb'))
+            #     self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
+            #                          f"Model Loaded successfully")
+            #     return model
+            if self.aws.is_file_present(self.model_path,get_model_name_from_db+".pkl")['status']:
+                print("File present in AWS S3 Storage-Load_model()")
 
                 model= pickle.load(open(os.path.join(self.model_path,get_model_name_from_db+".pkl"),'rb'))
+                model=self.aws.get_pickle_file(self.model_path,get_model_name_from_db+".pkl")['file_content']
                 self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
                                      f"Model Loaded successfully")
                 return model
@@ -335,12 +346,18 @@ class Predictor:
                 prediction_output.to_csv(output_file_path, index=None, header=True)
                 self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at {output_file_path}")
                 print("Prediction completed")
+                self.aws.upload_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,self.prediction_file_name,local_file_path=output_file_path,over_write=False)
+                print("Prediction File uploaded to AWS S3 storage")
+                self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at S3 Storage Location {output_file_path}")
+
                 return output_file_path,prediction_output.head(5)
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",
                                      f"{e}")
             # raise e
             return e
+    def download_prediction_file(self):
+        return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=r"D:\CloudStorageAutomation\cloud_storage_layer")
 
 
 if __name__ == '__main__':
@@ -355,8 +372,9 @@ if __name__ == '__main__':
 
     try:
         predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
-        predictor.predict()
-        predictor.load_model()
+        # predictor.predict()
+        # predictor.load_model()
+        print(predictor.download_prediction_file())
     except Exception as e:
         raise e
 

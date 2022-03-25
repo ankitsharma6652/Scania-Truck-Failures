@@ -37,7 +37,21 @@ t1=""
 def stopServer():
     os.kill(os.getpid(), signal.SIGINT)
     return jsonify({ "success": True, "message": "Server is shutting down..." })
+@application.route("/download_file", methods=['GET'])
+@cross_origin()
+def download_file():
+    config = read_yaml("config/config.yaml")
+    params = read_yaml("config/params.yaml")
 
+    args = argparse.ArgumentParser()
+    args.add_argument("--params", "-p", default="config/params.yaml")
+    args.add_argument("--config", default="config/config.yaml")
+    args.add_argument("--model", "-m", default="config/model.yaml")
+    parsed_args = args.parse_args()
+    predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
+                          model_path=parsed_args.model)
+    downloaded=predictor.download_prediction_file()
+    return Response(f"File is downloaded:{downloaded}")
 @application.route("/prediction_page", methods=['GET'])
 @cross_origin()
 def prediction_page():

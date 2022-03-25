@@ -2,7 +2,7 @@ import time
 from src.utils.email_sender.email_sender import email_sender
 from sklearn.ensemble import RandomForestClassifier
 import shutil
-from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
+from src.utils.all_utils import read_yaml, create_directory_path, save_local_df,model_training_logs
 import argparse
 import pandas as pd
 import os
@@ -283,7 +283,7 @@ class ModelTraining:
                                      f"Best Model Saved at : {self.model_dir_path}")
             with open(self.model_dir_path,'wb') as model_file:
                 p.dump(self.best_model,model_file)
-            self.aws.upload_file(os.path.join(self.artifacts_dir, self.model_dir).replace("\\",'/'),f"{self.best_model_name}.pkl",over_write=True)
+            self.aws.upload_file(os.path.join(self.artifacts_dir, self.model_dir).replace("\\",'/'),f"{self.best_model_name}.pkl",f"{self.best_model_name}.pkl",local_file_path=os.path.join(self.artifacts_dir, self.model_dir,f"{self.best_model_name}.pkl"),over_write=True)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"Model training file uploaded to the S3 at location {self.model_dir_path}")
             self.db_logs.update_model_training_thread_status('C')

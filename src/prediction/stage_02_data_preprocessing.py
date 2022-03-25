@@ -11,7 +11,7 @@ from imblearn import over_sampling
 from sklearn.decomposition import PCA
 import pickle as p
 from src.utils.DbOperations_Logs import DBOperations
-
+from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
 
 class preprocessing:
@@ -35,7 +35,8 @@ class preprocessing:
         self.pca_file_name=self.params['preprocesssing_objects']['pca_file_name']
         self.label_encoding_file_name=self.params['preprocesssing_objects']['label_encoding_file_name']
         self.imputer_file_name=self.params['preprocesssing_objects']['imputer_file_name']
-
+        access_key, secret_access_key = self.db_logs.get_aws_s3_keys()
+        self.aws = AmazonSimpleStorageService(access_key, secret_access_key, self.config['storage']['bucket_name'])
     def get_label_column(self, df, label):
         try:
             self.target_column = df[label]
@@ -77,8 +78,12 @@ class preprocessing:
         #     return e
         print(self.standard_scale_file_name)
         try:
-            f=open(os.path.join("artifacts/preprocesssing_objects_dir",self.standard_scale_file_name),'rb')
-            scaler=pickle.load(f)
+            # f=open(os.path.join("artifacts/preprocesssing_objects_dir",self.standard_scale_file_name),'rb')
+            scaler=(self.aws.get_pickle_file("artifacts/preprocesssing_objects_dir",self.standard_scale_file_name)['file_content'])
+            print(scaler)
+            # print((f['file_content']))
+
+            # scaler=(open(f['file_content'],'rb'))
             self.df=scaler.transform(df)
             print(df)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
@@ -120,8 +125,11 @@ class preprocessing:
             #                          "handle_missing_values_using_median_imputation",
             #                          "")
             # f=open(os.path.join("artifacts/preprocesssing_objects_dir",self.imputer_file_name),'rb')
-            self.impute_median=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.imputer_file_name),'rb'))
-            self.df=self.impute_median.transform(df)                                   
+            # self.impute_median=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.imputer_file_name),'rb'))
+            print((self.aws.get_pickle_file("artifacts/preprocesssing_objects_dir",self.imputer_file_name)['status']))
+            self.impute_median=(self.aws.get_pickle_file("artifacts/preprocesssing_objects_dir",self.imputer_file_name)['file_content']) # Reading median imputer file from AWS S3 storage
+
+            self.df=self.impute_median.transform(df)
             # self.impute_median = SimpleImputer(missing_values = np.nan, strategy='median', copy=True, verbose=2)
             # self.df_imputed_median = pd.DataFrame(self.impute_median.transform(self.df), columns=self.df.columns)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
@@ -131,6 +139,8 @@ class preprocessing:
             # print(df_imputed_median.isna().sum().sum())
             # print(df_imputed_median.shape)
             # df_imputed_median['class']=df['class']
+            print("Inside handle_missing_values_using_median_imputation()")
+            print(pd.DataFrame(self.df,columns=df.columns))
             return pd.DataFrame(self.df,columns=df.columns)
         except Exception as e:
             print(e)
@@ -166,9 +176,10 @@ class preprocessing:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "dimensionality_reduction_using_pca",
                                      "Performing dimensionality reduction using pca selecting 90 features(components) as they are  explaining 97% of data")
             # self.df_pca = PCA(n_components=n_components, random_state=random_state)
+            self.df_pca=(self.aws.get_pickle_file("artifacts/preprocesssing_objects_dir",self.pca_file_name)['file_content']) # Reading median PCA object file from AWS S3 storage
 
             # self.df = self.df_pca.fit_transform(self.df)
-            self.df_pca=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.pca_file_name),'rb'))
+            # self.df_pca=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.pca_file_name),'rb'))
             self.df=self.df_pca.transform(self.df)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "dimensionality_reduction_using_pca",
                                      "Completed dimensionality_reduction using PCA done on Test Dataset")
@@ -191,7 +202,9 @@ class preprocessing:
             # self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "label_encoding",
             #                          "Converted the categorical values from label column to 0 and 1")
             # return self.df
-            self.le=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.label_encoding_file_name),'rb'))
+            # self.le=pickle.load(open(os.path.join("artifacts/preprocesssing_objects_dir",self.label_encoding_file_name),'rb'))
+            self.le=(self.aws.get_pickle_file("artifacts/preprocesssing_objects_dir",self.label_encoding_file_name)['file_content']) # Reading median PCA object file from AWS S3 storage
+
             self.df['class'] = self.le.transform(self.df['class'])
             # self.df=self.le.transform(self.df)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "label_encoding",
@@ -291,11 +304,21 @@ class preprocessing:
             label = self.params["target_columns"]['columns']
             standard_scaling_file_dir = self.params['standard_scalar']['standard_scale_file_path']
             standard_scale_predfile_name = self.params['standard_scalar']['standard_scale_predfile_name']
-            raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_test_file)
+            # raw_local_file_path = os.path.join(artifacts_dir, local_data_dirs, local_data_test_file)
+            #
+            # print(raw_local_file_path)
+            raw_test_file = (os.path.join(artifacts_dir, local_data_dirs)).replace('\\', '/')
+            # self.df = pd.read_csv(raw_local_file_path)
+            # print(raw_local_file_path)
+            # self.df = pd.read_csv(raw_local_file_path) # Local File
+            print((raw_test_file, local_data_test_file))
+            self.df = self.aws.read_csv_file(raw_test_file, local_data_test_file)[
+                'data_frame']  # Reading Data from S3 Storage
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "data_preprocessing",
+                                     "Successfully  read the test dataset from s3 Storage")
 
-            print(raw_local_file_path)
+            # print(self.df)
 
-            self.df = pd.read_csv(raw_local_file_path)
             # print(self.df)
             self.df_after_removing_missing_values_columns = self.remove_missing_values_columns(self.df)
             print("After remove_missing_values_columns",self.df_after_removing_missing_values_columns)
@@ -303,7 +326,8 @@ class preprocessing:
             print("After Label encoding",self.df_after_label_encoding)
             # print(self.df_after_label_encoding.isna().sum())
             self.df_missing_values_handled = self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)
-            print(self.df_missing_values_handled.isna().sum())
+            print("After Missing values handled",self.df_missing_values_handled)
+            # print(self.df_missing_values_handled.isna().sum())
             # self.handle_missing_values_using_median_imputation(self.df_after_label_encoding)[0]
             # df = self.handle_missing_values_using_median_imputation(df)
             # self.df_remove_highly_correlated_features = self.remove_highly_corr_features(self.df_missing_values_handled)
@@ -333,8 +357,19 @@ class preprocessing:
             # # standard_scaling_data_path = os.path.join(artifacts_dir, standard_scaling_file_dir,
             #                                           standard_scale_predfile_name)
             # # save_local_df(self.standard_scalar_data, preprocessed_data_path)
+
             save_local_df(self.target_column, target_column_data_path)
+            self.aws.upload_file(os.path.join(artifacts_dir, preprocessed_data_dir).replace('\\', '/'),
+                                 preprocessed_test_file, preprocessed_test_file, local_file_path=preprocessed_data_path,
+                                 over_write=True)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "data_preprocessing",
+                                     "Preprocessed test data file uploaded to  s3 storage")
             save_local_df(self.standard_scalar_data,preprocessed_data_path)
+            self.aws.upload_file(os.path.join(artifacts_dir, target_column_data_dir).replace('\\', '/'),
+                                 target_column_testdata_file, target_column_testdata_file, local_file_path=target_column_data_path,
+                                 over_write=True)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "data_preprocessing",
+                                     "Preprocessed target data file uploaded to  s3 storage")
             # with open(standard_scaling_data_path, 'wb') as s:
             #     p.dump(self.standard_scaling_object, s)
             # self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,

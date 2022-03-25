@@ -44,6 +44,14 @@ def save_reports(report: dict, report_path: str, indentation=4):
         json.dump(report, f, indent=indentation)
     logging.info(f"reports are saved at {report_path}")
 
+def model_training_logs(model):
+    with io.StringIO() as stream:
+        model.summary(
+            print_fn=lambda x: stream.write(f"{x}\n")
+        )
+        summary_str = stream.getvalue()
+    return summary_str
+
 def send_email(to,mail_text):
         """
         message: Message string in html format

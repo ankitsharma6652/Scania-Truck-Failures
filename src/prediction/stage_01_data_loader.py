@@ -5,7 +5,7 @@ import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
-def get_data(config_path,params_path,local:int=0):
+def get_data(config_path,params_path):
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
     params = read_yaml(params_path)
@@ -18,6 +18,9 @@ def get_data(config_path,params_path,local:int=0):
     db_logs.establish_connection(user_name, password)
     db_logs.create_table(prediction_table_name)
     config = read_yaml(config_path)
+    access_key, secret_access_key = db_logs.get_aws_s3_keys()
+    print(access_key, secret_access_key)
+    aws = AmazonSimpleStorageService(access_key, secret_access_key, config['storage']['bucket_name'])
 
     try:
 
@@ -43,7 +46,12 @@ def get_data(config_path,params_path,local:int=0):
             print("Test Data Exists")
             db_logs.insert_logs(prediction_table_name, stage_name, "get_data",
                                 f"Test file already exists  at location:{local_data_test_file_path}")
+        if not  aws.is_file_present(os.path.join(artifacts_dir, local_data_dirs).replace("\\","/"),local_data_test_file)['status']:
+            db_logs.insert_logs(prediction_table_name, stage_name, "get_data", f"Training dataset uploaded to s3 storage at location {local_data_test_file_path}")
 
+            aws.upload_file(os.path.join(artifacts_dir, local_data_dirs).replace("\\","/"),local_data_test_file,local_data_test_file,local_file_path=local_data_test_file_path)
+        else:
+            db_logs.insert_logs(training_table_name, stage_name, "get_data", f"Test dataset Already exists in s3 storage at location {local_data_test_file_path}")
     except Exception as e:
         print(e)
         db_logs.insert_logs(prediction_table_name, stage_name, "get_data", e)
