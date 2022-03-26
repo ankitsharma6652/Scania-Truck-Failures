@@ -344,21 +344,21 @@ class Predictor:
             output_file_path = os.path.join(self.artifacts_dir,self.prediction_output_file_path, self.prediction_file_name)
             # print(output_file_path)
             # print(data)
-            if prediction_output is not None:
-                self.aws.write_file_content(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,prediction_output)
-                prediction_output.to_csv(output_file_path, index=None, header=True)
-                self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at {output_file_path}")
-                print("Prediction completed")
-                self.aws.upload_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,self.prediction_file_name,local_file_path=output_file_path,over_write=False)
-                print("Prediction File uploaded to AWS S3 storage")
-                self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at S3 Storage Location {output_file_path}")
+            # if prediction_output is not None:
+            self.aws.write_file_content(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,prediction_output)
+            prediction_output.to_csv(output_file_path, index=None, header=True)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at {output_file_path}")
+            print("Prediction completed")
+            self.aws.upload_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,self.prediction_file_name,local_file_path=output_file_path,over_write=False)
+            print("Prediction File uploaded to AWS S3 storage")
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at S3 Storage Location {output_file_path}")
 
-                return output_file_path,prediction_output.head(5)
+            return output_file_path,prediction_output.head(5)
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",
                                      f"{e}")
             # raise e
-            return e
+            return e,e
     def download_prediction_file(self):
         return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=r"D:\CloudStorageAutomation\cloud_storage_layer")
 
