@@ -353,7 +353,7 @@ class Predictor:
             print("Prediction File uploaded to AWS S3 storage")
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at S3 Storage Location {output_file_path}")
 
-            return output_file_path,prediction_output.head(5)
+            return output_file_path,prediction_output
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",
                                      f"{e}")
