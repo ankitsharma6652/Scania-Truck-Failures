@@ -122,8 +122,8 @@ def prediction():
 
     try:
         # print("Train Route Client",type(recievers_email))
-        config = read_yaml("config/config.yaml")
-        params = read_yaml("config/params.yaml")
+        config = read_yaml("./config/config.yaml")
+        params = read_yaml("./config/params.yaml")
 
         args = argparse.ArgumentParser()
         args.add_argument("--params", "-p", default="config/params.yaml")
@@ -167,7 +167,7 @@ def prediction():
 
     except Exception as e:
 
-        return Response("Error Occurred! %s" % e)
+        return Response("Error Occurred!! %s" % e)
     # return Response("Prediction successful!!")
 @application.route("/start_training_again", methods=['GET','POST'])
 @cross_origin()
