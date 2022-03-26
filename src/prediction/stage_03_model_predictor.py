@@ -236,6 +236,7 @@ class Predictor:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Exception occured in the predictor class.")
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Unsuccessful.Exited from the predictor class.")
             raise e
+            return e
 
     # def scale_data(self, data, path, is_dataframe_format_required=False, is_new_scaling=True):
     #     """
@@ -325,6 +326,7 @@ class Predictor:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
                                      f"{e}")
             raise e
+            return e
 
     def predict(self):
         try:
@@ -343,6 +345,7 @@ class Predictor:
             # print(output_file_path)
             # print(data)
             if prediction_output is not None:
+                self.aws.write_file_content(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,prediction_output)
                 prediction_output.to_csv(output_file_path, index=None, header=True)
                 self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at {output_file_path}")
                 print("Prediction completed")
@@ -359,7 +362,6 @@ class Predictor:
     def download_prediction_file(self):
         return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=r"D:\CloudStorageAutomation\cloud_storage_layer")
 
-
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()
@@ -372,9 +374,9 @@ if __name__ == '__main__':
 
     try:
         predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,model_path=parsed_args.model)
-        # predictor.predict()
+        predictor.predict()
         # predictor.load_model()
-        print(predictor.download_prediction_file())
+        # print(predictor.download_prediction_file())
     except Exception as e:
         raise e
 

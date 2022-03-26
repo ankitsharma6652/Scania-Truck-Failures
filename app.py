@@ -159,11 +159,11 @@ def prediction():
 
     except ValueError:
 
-        return Response("Error Occurred! %s" % ValueError)
+        return Response("Value Error:Error Occurred! %s" % ValueError)
 
     except KeyError:
 
-        return Response("Error Occurred! %s" % KeyError)
+        return Response("Key Error:Error Occurred! %s" % KeyError)
 
     except Exception as e:
 
