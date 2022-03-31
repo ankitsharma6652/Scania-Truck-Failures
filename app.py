@@ -60,7 +60,7 @@ def prediction_page():
 @application.route("/", methods=['GET'])
 @cross_origin()
 def home():
-    os.system("dvc repro")
+    # os.system("dvc repro")
     return render_template('homepage.html')
 
 
@@ -247,7 +247,7 @@ def trainRouteClient(recievers_email):
                                            model_path=parsed_args.model,recievers_mail=recievers_email)
         mail_text=model_training.start_model_training()
         # email_sender().send_email(mail_text=mail_text, TO=recievers_email)
-        # print("email sent",recievers_email)
+        print("email sent",recievers_email)
 
         # stopServer()
 
