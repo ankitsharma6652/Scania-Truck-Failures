@@ -23,10 +23,11 @@ from sklearn.metrics  import roc_auc_score,accuracy_score
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
 
 class ModelTraining:
-    def __init__(self,config_path,params_path,model_path):
+    def __init__(self,config_path,params_path,model_path,recievers_mail:str=None):
         # self.file_object = file_object
         # self.logger_object = logger_object
         self.email_sender=email_sender()
+        self.TO=recievers_mail
         self.clf = RandomForestClassifier()
         self.xgb = XGBClassifier()
         self.stage_name= os.path.basename(__file__)[:-3]
@@ -55,7 +56,6 @@ class ModelTraining:
         self.model_dir=self.model['model']['model_dir']
         self.Random_forest = self.model['model']['random_forest']
         self.Xgboost=self.model['model']['xgboost']
-
         access_key, secret_access_key = self.db_logs.get_aws_s3_keys()
         self.aws = AmazonSimpleStorageService(access_key, secret_access_key, self.config['storage']['bucket_name'])
         self.preprocessed_data_path = os.path.join(self.artifacts_dir, self.preprocessed_data_dir, self.preprocessed_data_file)
@@ -290,9 +290,12 @@ class ModelTraining:
             self.db_logs.update_model_training_thread_status('C')
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      "Model Training process ended")
-            # self.email_sender.send_email(mail_text=self.mail_text,TO=self.recievers_email)
-            # print("email sent",self.recievers_email)
-            return self.mail_text
+            if self.TO is not None:
+
+                self.email_sender.send_email(mail_text=self.mail_text,TO=self.TO)
+                self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
+                                        f"Model Training complete Notification has been sent to {self.TO} with the content {self.mail_text}")
+                print("email sent",self.TO)
         except Exception as e:
             print(e)
             self.db_logs.update_model_training_thread_status('NS')
