@@ -177,7 +177,7 @@
 #     except Exception as e:
 #         raise e
 
-import os
+import os,sys
 import argparse
 import joblib
 import pandas as pd
@@ -187,6 +187,7 @@ from sklearn.preprocessing import StandardScaler
 from src.utils.DbOperations_Logs import DBOperations
 import pickle
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
+from src.exception import CustomException
 class Predictor:
 
     def __init__(self, config_path, params_path, model_path):
@@ -235,8 +236,7 @@ class Predictor:
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Exception occured in the predictor class.")
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_data", f"Data Load Unsuccessful.Exited from the predictor class.")
-            raise e
-            return e
+            raise (CustomException(e, sys)) from e
 
     # def scale_data(self, data, path, is_dataframe_format_required=False, is_new_scaling=True):
     #     """
@@ -325,9 +325,7 @@ class Predictor:
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
                                      f"{e}")
-            raise e
-            return e
-
+            raise (CustomException(e, sys)) from e
     def predict(self):
         try:
             data = self.get_data()
@@ -345,7 +343,7 @@ class Predictor:
             # print(output_file_path)
             # print(data)
             # if prediction_output is not None:
-            self.aws.write_file_content(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,prediction_output)
+            # self.aws.write_file_content(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,prediction_output)
             prediction_output.to_csv(output_file_path, index=None, header=True)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",f"Prediction file has been generated at {output_file_path}")
             print("Prediction completed")
@@ -358,7 +356,7 @@ class Predictor:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "predict",
                                      f"{e}")
             # raise e
-            return e,e
+            raise (CustomException(e, sys)) from e
     def download_prediction_file(self):
         return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=r"D:\CloudStorageAutomation\cloud_storage_layer")
 
@@ -378,6 +376,6 @@ if __name__ == '__main__':
         # predictor.load_model()
         # print(predictor.download_prediction_file())
     except Exception as e:
-        raise e
+        raise (CustomException(e, sys)) from e
 
 

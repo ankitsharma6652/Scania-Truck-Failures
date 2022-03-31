@@ -1,10 +1,10 @@
 from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
 import argparse
-import os
+import os,sys
 import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
-
+from src.exception import CustomException
 
 def get_data(config_path,params_path):
     # print("Inside Get Data Function")
@@ -66,7 +66,7 @@ def get_data(config_path,params_path):
     except Exception as e:
         print(e)
         db_logs.insert_logs(training_table_name, stage_name, "get_data", f"{e}")
-        raise Exception
+        raise (CustomException(e, sys)) from e
 
 
 if __name__ == '__main__':

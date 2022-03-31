@@ -5,7 +5,8 @@ import shutil
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df,model_training_logs
 import argparse
 import pandas as pd
-import os
+import os,sys
+from src.exception import CustomException
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer,MissingIndicator
 import numpy as np
@@ -118,7 +119,7 @@ class ModelTraining:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost",
                                      f"{e}")
-            raise Exception()
+            raise (CustomException(e, sys)) from e
 
     def get_best_params_for_random_forest(self,train_x,train_y):
         """
@@ -167,7 +168,7 @@ class ModelTraining:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_random_forest",
                                     f"{e}")
-            raise Exception()
+            raise (CustomException(e, sys)) from e
     def get_total_cost(self,con_mat):
         print("-" * 117)
         print('Confusion Matrix: ', '\n', con_mat)
@@ -220,7 +221,7 @@ class ModelTraining:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_model",
                                      f"{e}")
             print(e)
-            raise Exception()
+            raise (CustomException(e, sys)) from e
 
 
     def empty_model_dir(self):
@@ -235,7 +236,7 @@ class ModelTraining:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "empty_model_dir",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def start_model_training(self):
         try:
@@ -298,7 +299,7 @@ class ModelTraining:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "start_model_training",
                                      f"{e}")
             print('e')
-            return e
+            raise (CustomException(e, sys)) from e
 
 
 if __name__ == '__main__':

@@ -3,7 +3,8 @@ from signal import default_int_handler
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 import argparse
 import pandas as pd
-import os
+import os,sys
+from src.exception import CustomException
 from sklearn.model_selection import train_test_split
 from sklearn.impute import SimpleImputer, MissingIndicator
 import numpy as np
@@ -44,7 +45,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_label_column",
                                      f"{e}")
-            return(e)
+            raise (CustomException(e, sys)) from e
 
     # def get_target_column(self, config_path):
     #     self.params = read_yaml(config_path)
@@ -72,7 +73,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "standard_scaling",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def dimensionality_reduction_using_pca(self, df, n_components, random_state):
         """
@@ -94,7 +95,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "dimensionality_reduction_using_pca",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def label_encoding(self, df):
         """encode labels to 0 and 1"""
@@ -112,7 +113,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "label_encoding",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def remove_highly_corr_features(self, df):
         """
@@ -139,7 +140,7 @@ class preprocessing:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "remove_highly_corr_features",
                                      f"{e}")
 
-            return e
+            raise (CustomException(e, sys)) from e
 
     def upsampling_postive_class(self, df):
         """
@@ -161,7 +162,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "upsampling_postive_class",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
     def downsampling_neg_class(self, df):
         """
         #downsampling the negative class using smote technique to have balanced dataset
@@ -181,7 +182,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "downsampling_neg_class",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
     def handle_missing_values_using_median_imputation(self, df):
         """
         fill the missing values by using Median Imputation .
@@ -209,7 +210,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "handle_missing_values_using_median_imputation",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def remove_missing_values_columns(self, df):
         """
@@ -233,7 +234,7 @@ class preprocessing:
             self.db_logs.insert_logs(self.training_table_name, self.stage_name,
                                      "remove_missing_values_columns",
                                      f"{e}")
-            return  e
+            raise (CustomException(e, sys)) from e
 
     def data_preprocessing(self):
 
@@ -374,8 +375,7 @@ class preprocessing:
 
         except Exception as e:
             print(e)
-            raise Exception(e)
-            return e 
+            raise (CustomException(e, sys)) from e
     
 
 if __name__ == '__main__':
@@ -392,4 +392,4 @@ if __name__ == '__main__':
         preprocessing_object.data_preprocessing()
 
     except Exception as e:
-        raise e
+        raise (CustomException(e, sys)) from e

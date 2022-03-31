@@ -3,7 +3,7 @@ import pickle
 from src.utils.all_utils import read_yaml, create_directory_path, save_local_df
 import argparse
 import pandas as pd
-import os
+import os,sys
 from sklearn.impute import SimpleImputer, MissingIndicator
 import numpy as np
 from sklearn.preprocessing import LabelEncoder, StandardScaler
@@ -12,7 +12,7 @@ from sklearn.decomposition import PCA
 import pickle as p
 from src.utils.DbOperations_Logs import DBOperations
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
-
+from src.exception import CustomException
 
 class preprocessing:
 
@@ -48,8 +48,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "get_label_column",
                                      f"{e}")
-            return(e)
-
+            raise (CustomException(e, sys)) from e
     # def get_target_column(self, config_path):
     #     self.params = read_yaml(config_path)
     #     target_column = self.params["target_columns"]['columns']
@@ -93,7 +92,7 @@ class preprocessing:
         except Exception as e:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "standard_scaling",
                                          e)
-            raise Exception(e)
+            raise (CustomException(e, sys)) from e
 
 
     def remove_missing_values_columns(self, df):
@@ -115,7 +114,7 @@ class preprocessing:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
                                      "remove_missing_values_columns",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def handle_missing_values_using_median_imputation(self, df):
 
@@ -146,7 +145,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "handle_missing_values_using_median_imputation",
                                      f"{e}")
-            return e 
+            raise (CustomException(e, sys)) from e
 
     # def standard_scaling(self, df):
 
@@ -188,7 +187,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "dimensionality_reduction_using_pca",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def label_encoding(self, df):
         """encode labels to 0 and 1"""
@@ -214,7 +213,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "label_encoding",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def remove_highly_corr_features(self, df):
         """
@@ -242,7 +241,7 @@ class preprocessing:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "remove_highly_corr_features",
                                      f"{e}")
 
-            return e
+            raise (CustomException(e, sys)) from e
 
     def upsampling_postive_class(self, df):
         """
@@ -264,7 +263,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "upsampling_postive_class",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def downsampling_neg_class(self, df):
         """
@@ -285,7 +284,7 @@ class preprocessing:
             print(e)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "downsampling_neg_class",
                                      f"{e}")
-            return e
+            raise (CustomException(e, sys)) from e
 
     def data_preprocessing(self):
 
@@ -389,7 +388,7 @@ class preprocessing:
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name,
                                      "data_preprocessing",
                                      f"{e}")
-            raise e
+            raise (CustomException(e, sys)) from e
 
 
 if __name__ == '__main__':
@@ -408,4 +407,4 @@ if __name__ == '__main__':
 
 
     except Exception as e:
-        raise e
+        raise (CustomException(e, sys)) from e

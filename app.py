@@ -13,7 +13,8 @@ from src.prediction.stage_03_model_predictor import Predictor
 from wsgiref import simple_server
 from flask import Flask, request, render_template
 from flask import Response
-import os
+import os,sys
+from src.exception import CustomException
 from flask_cors import CORS, cross_origin
 import flask_monitoringdashboard as dashboard
 from src.utils.DbOperations_Logs import DBOperations

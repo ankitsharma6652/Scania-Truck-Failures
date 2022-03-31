@@ -1,10 +1,10 @@
 from src.utils.all_utils import read_yaml, create_directory_path, read_yaml
 import argparse
-import os
+import os,sys
 import pandas as pd
 from src.utils.DbOperations_Logs import DBOperations
 from cloud_storage_layer.aws.amazon_simple_storage_service import AmazonSimpleStorageService
-
+from src.exception import CustomException
 def get_data(config_path,params_path):
     stage_name = os.path.basename(__file__)[:-3]
     config = read_yaml(config_path)
@@ -55,7 +55,8 @@ def get_data(config_path,params_path):
     except Exception as e:
         print(e)
         db_logs.insert_logs(prediction_table_name, stage_name, "get_data", e)
-        return e
+        # return e
+        raise (CustomException(e, sys)) from e
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()
