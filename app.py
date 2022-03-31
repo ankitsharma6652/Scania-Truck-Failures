@@ -60,7 +60,7 @@ def prediction_page():
 @application.route("/", methods=['GET'])
 @cross_origin()
 def home():
-    # os.system("dvc repro")
+    os.system("dvc repro")
     return render_template('homepage.html')
 
 
