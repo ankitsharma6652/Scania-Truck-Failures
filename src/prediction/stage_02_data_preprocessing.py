@@ -358,12 +358,13 @@ class preprocessing:
             # # save_local_df(self.standard_scalar_data, preprocessed_data_path)
 
             save_local_df(self.target_column, target_column_data_path)
+            save_local_df(self.standard_scalar_data, preprocessed_data_path)
             self.aws.upload_file(os.path.join(artifacts_dir, preprocessed_data_dir).replace('\\', '/'),
                                  preprocessed_test_file, preprocessed_test_file, local_file_path=preprocessed_data_path,
                                  over_write=True)
             self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "data_preprocessing",
                                      "Preprocessed test data file uploaded to  s3 storage")
-            save_local_df(self.standard_scalar_data,preprocessed_data_path)
+            # save_local_df(self.standard_scalar_data,preprocessed_data_path)
             self.aws.upload_file(os.path.join(artifacts_dir, target_column_data_dir).replace('\\', '/'),
                                  target_column_testdata_file, target_column_testdata_file, local_file_path=target_column_data_path,
                                  over_write=True)
