@@ -314,7 +314,7 @@ class Predictor:
             if self.aws.is_file_present(self.model_path,get_model_name_from_db+".pkl")['status']:
                 print("File present in AWS S3 Storage-Load_model()")
 
-                model= pickle.load(open(os.path.join(self.model_path,get_model_name_from_db+".pkl"),'rb'))
+                # model= pickle.load(open(os.path.join(self.model_path,get_model_name_from_db+".pkl"),'rb'))
                 model=self.aws.get_pickle_file(self.model_path,get_model_name_from_db+".pkl")['file_content']
                 self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "load_model",
                                      f"Model Loaded successfully")
