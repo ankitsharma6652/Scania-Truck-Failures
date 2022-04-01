@@ -46,7 +46,7 @@ def save_reports(report: dict, report_path: str, indentation=4):
 
 def model_training_logs(model):
     with io.StringIO() as stream:
-        model.summary(
+        model.fit(
             print_fn=lambda x: stream.write(f"{x}\n")
         )
         summary_str = stream.getvalue()

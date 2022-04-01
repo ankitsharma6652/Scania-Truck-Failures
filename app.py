@@ -1,4 +1,5 @@
 import argparse
+from tkinter import Tk, filedialog
 import smtplib
 from email.message import EmailMessage
 from src.utils.email_sender.email_sender import email_sender
@@ -49,10 +50,17 @@ def download_file():
     args.add_argument("--config", default="config/config.yaml")
     args.add_argument("--model", "-m", default="config/model.yaml")
     parsed_args = args.parse_args()
+    root = Tk()  # pointing root to Tk() to use it as Tk() in program.
+    root.withdraw()  # Hides small tkinter window.
+
+    root.attributes('-topmost', True)  # Opened windows will be active. above all windows despite of selection.
+
+    path = filedialog.askdirectory()  # Returns opened path as str
+    print(path)
     predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
                           model_path=parsed_args.model)
-    downloaded=predictor.download_prediction_file()
-    return Response(f"File is downloaded:{downloaded}")
+    downloaded=predictor.download_prediction_file(path=path)
+    return render_template('download_prediction_file.html',prediction_file_location=downloaded['message'])
 @application.route("/prediction_page", methods=['GET'])
 @cross_origin()
 def prediction_page():

@@ -357,8 +357,8 @@ class Predictor:
                                      f"{e}")
             # raise e
             raise (CustomException(e, sys)) from e
-    def download_prediction_file(self):
-        return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=r"D:\CloudStorageAutomation\cloud_storage_layer")
+    def download_prediction_file(self,path):
+        return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=path)
 
 if __name__ == '__main__':
 

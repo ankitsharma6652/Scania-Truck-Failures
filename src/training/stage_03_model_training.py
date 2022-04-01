@@ -92,7 +92,8 @@ class ModelTraining:
             self.grid = GridSearchCV(XGBClassifier(use_label_encoder=False), self.param_grid_xgboost, verbose=10,
                                      cv=5,scoring='f1')
             # finding the best parameters
-            print(model_training_logs(self.grid.fit(train_x, train_y)))
+            self.grid.fit(train_x, train_y)
+
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost",
                                      f" Best parameters finding  Ended")
 
