@@ -245,7 +245,7 @@ def trainRouteClient(recievers_email):
         # print("Email",request.form['email'])
         model_training = ModelTraining(config_path=parsed_args.config, params_path=parsed_args.params,
                                            model_path=parsed_args.model,recievers_mail=recievers_email)
-        mail_text=model_training.start_model_training()
+        model_training.start_model_training()
         # email_sender().send_email(mail_text=mail_text, TO=recievers_email)
         print("email sent",recievers_email)
 

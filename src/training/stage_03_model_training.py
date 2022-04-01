@@ -92,7 +92,7 @@ class ModelTraining:
             self.grid = GridSearchCV(XGBClassifier(use_label_encoder=False), self.param_grid_xgboost, verbose=10,
                                      cv=5,scoring='f1')
             # finding the best parameters
-            self.grid.fit(train_x, train_y)
+            print(model_training_logs(self.grid.fit(train_x, train_y)))
             self.db_logs.insert_logs(self.training_table_name, self.stage_name, "get_best_params_for_xgboost",
                                      f" Best parameters finding  Ended")
 
@@ -245,7 +245,6 @@ class ModelTraining:
             time.sleep(1)
             # self.empty_model_dir()
             create_directory_path([os.path.join(self.artifacts_dir, self.model_dir)])
-
             # self.training_data=pd.read_csv(self.preprocessed_data_path)
             # self.target_column_data=pd.read_csv(self.target_column_data_path).iloc[:,0]
             # print(type(self.target_column_data.iloc[0]))
