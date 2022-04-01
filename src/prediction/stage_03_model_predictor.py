@@ -358,8 +358,17 @@ class Predictor:
             # raise e
             raise (CustomException(e, sys)) from e
     def download_prediction_file(self,path):
-        return self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=path)
-
+        try:
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "download_prediction_file",
+                                     f"Prediction file downloading started")
+            status=self.aws.download_file(os.path.join(self.artifacts_dir,self.prediction_output_file_path).replace("\\","/"),self.prediction_file_name,local_system_directory=path)
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "download_prediction_file",
+                                     f"Prediction file downloaded:{status}")
+            return status
+        except Exception as e:
+            self.db_logs.insert_logs(self.prediction_table_name, self.stage_name, "download_prediction_file",
+                                     f"{e}")
+            raise (CustomException(e, sys)) from e
 if __name__ == '__main__':
 
     args = argparse.ArgumentParser()

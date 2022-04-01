@@ -42,25 +42,29 @@ def stopServer():
 @application.route("/download_file", methods=['GET'])
 @cross_origin()
 def download_file():
-    config = read_yaml("config/config.yaml")
-    params = read_yaml("config/params.yaml")
+    try:
+        config = read_yaml("config/config.yaml")
+        params = read_yaml("config/params.yaml")
 
-    args = argparse.ArgumentParser()
-    args.add_argument("--params", "-p", default="config/params.yaml")
-    args.add_argument("--config", default="config/config.yaml")
-    args.add_argument("--model", "-m", default="config/model.yaml")
-    parsed_args = args.parse_args()
-    root = Tk()  # pointing root to Tk() to use it as Tk() in program.
-    root.withdraw()  # Hides small tkinter window.
+        args = argparse.ArgumentParser()
+        args.add_argument("--params", "-p", default="config/params.yaml")
+        args.add_argument("--config", default="config/config.yaml")
+        args.add_argument("--model", "-m", default="config/model.yaml")
+        parsed_args = args.parse_args()
+        root = Tk()  # pointing root to Tk() to use it as Tk() in program.
+        root.withdraw()  # Hides small tkinter window.
 
-    root.attributes('-topmost', True)  # Opened windows will be active. above all windows despite of selection.
+        root.attributes('-topmost', True)  # Opened windows will be active. above all windows despite of selection.
 
-    path = filedialog.askdirectory()  # Returns opened path as str
-    print(path)
-    predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
-                          model_path=parsed_args.model)
-    downloaded=predictor.download_prediction_file(path=path)
-    return render_template('download_prediction_file.html',prediction_file_location=downloaded['message'])
+        path = filedialog.askdirectory()  # Returns opened path as str
+        print(path)
+        predictor = Predictor(config_path=parsed_args.config, params_path=parsed_args.params,
+                            model_path=parsed_args.model)
+        downloaded=predictor.download_prediction_file(path=path)
+        return render_template('download_prediction_file.html', prediction_file_location=downloaded['message'])
+    except Exception as e:
+        raise (CustomException(e, sys)) from e
+    # return render_template('download_prediction_file.html',prediction_file_location=downloaded['message'])
 @application.route("/prediction_page", methods=['GET'])
 @cross_origin()
 def prediction_page():
